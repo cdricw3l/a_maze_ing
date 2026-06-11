@@ -1,9 +1,10 @@
 NAME=a_maze_ing.py
-FLAKE= flake8
+FLAKE=flake8
 MYPY=mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+VENV=venv
 
 venv:
-	python3 -m venv venv
+	python3 -m venv $(venv)
 
 run:
 	python3 $(NAME)
@@ -13,10 +14,11 @@ lt:
 	@$(MYPY)
 
 lint:
-	@make -i lt
+	@make -i -s lt
 
 clean:
 	find . -type d \( -name "*.mypy_cache" -o -name "*__pycache__" \) -exec rm -rf {} \;
+	rm -rf $(VENV)
 
 COM= generic_com
 git:
