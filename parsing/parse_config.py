@@ -33,7 +33,7 @@ def read_raw_config(filepath: str | Path) -> Dict[str, str]:
             if not line.strip():
                 continue
             stripped = line.lstrip()
-            if stripped.startswith('#') or stripped.startswith(';'):
+            if stripped.startswith('#'):
                 continue
 
             if '=' not in line:
