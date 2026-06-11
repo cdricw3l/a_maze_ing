@@ -1,4 +1,4 @@
-NAME= a_maze_ing.py
+NAME=a_maze_ing.py
 FLAKE= flake8
 MYPY=mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
@@ -16,7 +16,7 @@ lint:
 	@make -i lt
 
 clean:
-	find .  \( -name __pycache__ -o -name .mypy_cache\)
+	find . -type d \( -name "*.mypy_cache" -o -name "*__pycache__" \) -exec rm -rf {} \;
 
 COM= generic_com
 git:
