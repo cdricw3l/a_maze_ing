@@ -10,7 +10,6 @@ run:
 	python3 $(NAME)
 
 lt: 
-	@$(FLAKE)
 	@$(MYPY)
 
 lint:
