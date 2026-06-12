@@ -1,4 +1,4 @@
-NAME=a_maze_ing.py
+NAME=a_maze_ing/main.py
 FLAKE=flake8
 MYPY=mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 VENV=venv
