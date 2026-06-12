@@ -4,7 +4,7 @@ MYPY=mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --d
 VENV=venv
 
 venv:
-	python3 -m venv $(venv)
+	uv  venv $(VENV)
 
 run:
 	python3 $(NAME)

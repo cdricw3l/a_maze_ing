@@ -1,3 +1,2 @@
-venv/
-.mypy_cache/
-__pycache__/
+.vscode/
+a_maze_ing/.venv
