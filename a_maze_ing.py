@@ -1,5 +1,8 @@
 from collections import defaultdict
-from typing import DefaultDict, Iterable, List, Tuple
+from typing import DefaultDict, Iterable, List, Tuple, Set, Optional
+from parsing.parse_config import Config, parse_config, ConfigError
+import random
+import sys
 
 Cell = Tuple[int, int]
 
@@ -56,9 +59,6 @@ class MazeGrid:
             raise MazeValidationError(f"Cell {cell} is out of bounds")
         return list(self.graph[cell])
 
-    def all_cells(self) -> Iterable[Cell]:
-        return tuple(self.graph.keys())
-
     def validate(self) -> None:
         for cell, neighbors in self.graph.items():
             if not self.in_bounds(cell):
@@ -82,6 +82,58 @@ class MazeGrid:
     def carve_passage(self, cell: Cell, neighbor: Cell) -> None:
         self.add_edge(cell, neighbor)
 
+    def random_unvisited_neighbor(
+        self,
+        cell: Cell,
+        visited: Set[Cell]
+    ) -> Optional[Cell]:
+        candidates: List[Cell] = []
+        x, y = cell
+
+        for neighbor in [(x, y-1), (x+1, y), (x, y+1), (x-1, y)]:
+            if not self.in_bounds(neighbor):
+                continue
+            if neighbor in visited:
+                continue
+            candidates.append(neighbor)
+
+        if not candidates:
+            return None
+
+        return random.choice(candidates)
+
+    def forty_two_logo(width: int, height: int) -> Set[Cell]:
+        forbidden: set[Cell] = set()
+        if width < 7 and height < 7:
+            return forbidden
+        x: int = width / 2
+        y: int = height / 2
+        forbidden = {
+            (x+1, y), (x+2, y), (x-1, y), (x-2, y),
+            (x+1, y+2), (x+1, y-2), (x+1, y-1),
+            (x+2, y+2), (x+2, y+1), (x+2, y-2),
+            (x-2, y+2), (x-2, y+1), (x-1, y-1), (x-1, y-2)
+        }
+        return forbidden
+
+    def make_imperfect(self, percent: float = 0.05) -> None:
+        """Add random passages to create alternative paths."""
+        walls = [
+            ((x, y), (nx, ny))
+            for x in range(self.width)
+            for y in range(self.height)
+            for nx, ny in [(x+1, y), (x, y+1)]
+            if self.in_bounds((nx, ny)) and (nx, ny) not in self.graph[(x, y)]
+            and len(self.graph[(x, y)]) < 2
+        ]
+
+        if walls:
+            num_to_remove = int(len(walls) * percent)
+            if num_to_remove == 0:
+                num_to_remove = 1
+            for a, b in random.sample(walls, min(num_to_remove, len(walls))):
+                self.carve_passage(a, b)
+
     def __repr__(self) -> str:
         return (
             f"MazeGrid(width={self.width}, height={self.height}, "
@@ -89,13 +141,44 @@ class MazeGrid:
         )
 
 
+def run_algorithm(config: Config) -> MazeGrid:
+    if config.seed is not None:
+        random.seed(config.seed)
+    maze = MazeGrid(config.width, config.height)
+    visited: Set[Cell] = maze.forty_two_logo(maze.width, maze.height)
+    visited.add(config.entry)
+    stack: List[Cell] = [config.entry]
+
+    while stack:
+        current = stack[-1]
+        neighbor = maze.random_unvisited_neighbor(current, visited)
+        if neighbor is None:
+            stack.pop()
+            continue
+
+        maze.carve_passage(current, neighbor)
+        visited.add(neighbor)
+        stack.append(neighbor)
+
+    if config.perfect is False:
+        maze.make_imperfect(0.1)
+    return maze
+
+
 def main() -> None:
-    maze = MazeGrid(4, 3)
-    maze.carve_passage((0, 0), (1, 0))
-    maze.carve_passage((1, 0), (1, 1))
-    maze.validate()
-    print(maze)
-    print("Neighbors of (1,0):", maze.neighbors((1, 0)))
+    try:
+        config: Config = parse_config("./config.txt")
+    except ConfigError as e:
+        print(f"{e}")
+        sys.exit(1)
+    maze: MazeGrid = run_algorithm(config)
+
+    maze2 = MazeGrid(4, 3)
+    maze2.carve_passage((0, 0), (1, 0))
+    maze2.carve_passage((1, 0), (1, 1))
+    maze2.validate()
+    print(maze2)
+    print("Neighbors of (1,0):", maze2.neighbors((1, 0)))
 
 
 if __name__ == '__main__':

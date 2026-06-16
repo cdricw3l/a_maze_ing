@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 
-ALLOWED_KEYS = {"WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"}
+ALLOWED_KEYS = {"WIDTH", "HEIGHT",
+                "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT", "SEED"}
 
 
 class ConfigError(ValueError):
@@ -68,6 +69,7 @@ class Config:
     exit: Tuple[int, int]
     output_file: str
     perfect: bool
+    seed: Optional[int] = None
 
 
 def validate_width(value: Optional[str]) -> int:
@@ -154,6 +156,18 @@ def validate_perfect(value: Optional[str]) -> bool:
     raise ConfigError(msg)
 
 
+def validate_seed(value: Optional[str]) -> Optional[int]:
+    if value is None:
+        return None
+    try:
+        seed = int(value)
+    except ValueError:
+        raise ConfigError(f"SEED must be an integer, got: {value}")
+    if seed < 0:
+        raise ConfigError(f"SEED must be non-negative, got: {seed}")
+    return seed
+
+
 def parse_config(filepath: str | Path) -> Config:
     raw = read_raw_config(filepath)
     width = validate_width(raw.get('WIDTH'))
@@ -162,6 +176,7 @@ def parse_config(filepath: str | Path) -> Config:
     exit_ = validate_exit(raw.get('EXIT'), width, height)
     output_file = validate_output_file(raw.get('OUTPUT_FILE'))
     perfect = validate_perfect(raw.get('PERFECT'))
+    seed = validate_seed(raw.get('SEED'))
     if entry == exit_:
         raise ConfigError("ENTRY and EXIT cannot be the same point")
     return Config(
@@ -171,6 +186,7 @@ def parse_config(filepath: str | Path) -> Config:
         exit=exit_,
         output_file=output_file,
         perfect=perfect,
+        seed=seed,
     )
 
 
