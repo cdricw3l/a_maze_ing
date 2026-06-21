@@ -102,6 +102,7 @@ class MazeGrid:
 
         return random.choice(candidates)
 
+    @staticmethod
     def forty_two_logo(width: int, height: int) -> Set[Cell]:
         forbidden: set[Cell] = set()
         if width < 7 and height < 7:
@@ -167,7 +168,7 @@ def run_algorithm(config: Config) -> MazeGrid:
 
 def main() -> None:
     try:
-        config: Config = parse_config("./config.txt")
+        config: Config = parse_config("config/config.txt")
     except ConfigError as e:
         print(f"{e}")
         sys.exit(1)
@@ -177,7 +178,7 @@ def main() -> None:
     maze2.carve_passage((0, 0), (1, 0))
     maze2.carve_passage((1, 0), (1, 1))
     maze2.validate()
-    print(maze2)
+    print(maze)
     print("Neighbors of (1,0):", maze2.neighbors((1, 0)))
 
 
