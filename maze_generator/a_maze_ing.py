@@ -1,6 +1,6 @@
 from collections import defaultdict
 from typing import DefaultDict, Iterable, List, Tuple, Set, Optional
-from parsing.parse_config import Config, parse_config, ConfigError
+from parsing import *
 import random
 import sys
 
