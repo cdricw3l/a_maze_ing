@@ -1,9 +1,10 @@
 from amazing.maze_generator.a_maze_ing import MazeGrid
 from termcolor import colored, cprint
 import sys
+import typing
 
 def prRed(s): print("\033[91m {}\033[00m".format(s))
-def prGreen(s): print("\033[92m\033[1m {}\033[00m".format(s), end= " ")
+def prGreen(s): print("\033[92m {}\033[00m".format(s), end= " ")
 def prYellow(s): print("\033[93m {}\033[00m".format(s))
 def prLightPurple(s): print("\033[94m {}\033[00m".format(s))
 def prPurple(s): print("\033[95m {}\033[00m".format(s))
@@ -55,29 +56,66 @@ test = [u'\u2502',   #  0x00b3 -> BOX DRAWINGS LIGHT VERTICAL
         u'\u250c' ]  #  0x00da -> BOX DRAWINGS LIGHT DOWN AND RIGHT
 
 
-class Visualisation:
-    __c_w: int
-    __c_h: int
-    __m_w: int
-    __m_h: int
+class Char:
+    LT: typing.Literal[True] = '╔'
+    LB: typing.Literal[True] = '╚' 
+    RT: typing.Literal[True] = '╗' 
+    RB: typing.Literal[True] = '╝' 
+    JT: typing.Literal[True] = '╦'
+    JB: typing.Literal[True] = '╩'
+    JL: typing.Literal[True] = '╠'
+    JR: typing.Literal[True] = '╣'
+    JM: typing.Literal[True] = '╬'
+    H: typing.Literal[True] = '═'
+    V: typing.Literal[True] = '║'
 
-    def __init__(self, c_h: int, c_w: int, m_h: int, m_w):
+class Drawing:
+
+
+    def __init__(self):
+        self.__char = {"DOUBLE_VERTI_PIPE" : u'\u2551', "DOUBLE_RIGHT_TOP" : u'\u2557', "DOUBLE_LEFT_TOP" : u'\u2554',
+                       "DOUBLE_LEFT_BOTTOM" : u'\u255a', "DOUBLE_RIGHT_BOTTOM" :u'\u255d', "DOUBLE_HORIZ_PIPE" : u'\u2550', "joint": u'\u2566'}
+    
+    def line(self, size: int, c: str):
+        for i in range(size):
+            print(c, end="", flush=True)
+
+
+class Visualisation:
+    __c_w: float
+    __c_h: float
+    __m_w: float
+    __m_h: float
+
+    def __init__(self, c_h: float, c_w: float, m_h: float, m_w: float):
         self.__c_h = c_h
         self.__c_w = c_w
         self.__m_h = m_h
         self.__m_w = m_w
 
-    def pixel(self, ph: int):
-        print(f"{\033[92mu'\u256c'}", end="")
+    def test(self):
+        symbs = [u'\u255a', u'\u2554', u'\u2569', u'\u2566', u'\u2560', u'\u2550', u'\u256c']
+        for sym in symbs:
+            print(sym)
+            print()
 
-        # for x in test:
-        #     for i in range(10):
-        #         print(f"{u'\u256c'}", end="")
-        #     print(f"{ascii(x)}", end="")
-        #     print()
-        
+    def visu(self):
+        # symbs = [u'\u255a', u'\u2554', u'\u2569', u'\u2566', u'\u2560', u'\u2550', u'\u256c']
+        # for sym in symbs:
+        #     print(sym)
+        d_object: Drawing = Drawing()
+        char: Char = Char()
+        for i in range(self.__m_h):
+            for j in range(self.__m_w):
+                if i == 0 and j == 0:
+                    d_object.line(1 , char.LT)
+                    d_object.line(3 , char.H)
+                elif i == 0 and j > 0 and j < (self.__m_w * self.__c_w):
+                    d_object.line(4 , char.H)
+                
+            print()
 
 
 def visualisation_maze(maze: MazeGrid) -> None:
-    visu: Visualisation = Visualisation(4,4,5,5)
-    visu.pixel(100)
+    visu: Visualisation = Visualisation(8,8,10,10)
+    visu.visu()
