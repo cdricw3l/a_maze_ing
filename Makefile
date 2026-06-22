@@ -7,7 +7,7 @@ venv:
 	uv  venv $(VENV)
 
 run:
-	python3 $(NAME)
+	@python3 $(NAME)
 
 lt: 
 	@$(MYPY)
