@@ -84,8 +84,9 @@ class Drawing:
 class Visualisation:
     __c_w: float
     __c_h: float
-    __m_w: float
     __m_h: float
+    __m_w: float
+
 
     def __init__(self, c_h: float, c_w: float, m_h: float, m_w: float):
         self.__c_h = c_h
@@ -99,23 +100,48 @@ class Visualisation:
             print(sym)
             print()
 
-    def visu(self):
+    def visu(self, cells: list[tuple[str, ...]]) -> None:
         # symbs = [u'\u255a', u'\u2554', u'\u2569', u'\u2566', u'\u2560', u'\u2550', u'\u256c']
         # for sym in symbs:
         #     print(sym)
-        d_object: Drawing = Drawing()
         char: Char = Char()
-        for i in range(self.__m_h):
-            for j in range(self.__m_w):
-                if i == 0 and j == 0:
-                    d_object.line(1 , char.LT)
-                    d_object.line(3 , char.H)
-                elif i == 0 and j > 0 and j < (self.__m_w * self.__c_w):
-                    d_object.line(4 , char.H)
-                
+        draw: Drawing = Drawing()
+        for x in range(self.__m_h * self.__c_h):
+            p = 0
+            for y in range(self.__m_w * self.__c_w):
+
+                if x == 0 and y == 0 and p != 3:
+                    draw.line(1,char.LT)
+                elif x == 0 and y == (self.__c_w * self.__m_w - 1):
+                    draw.line(1, char.RT)
+                elif x == 0 and y == (self.__c_w * self.__m_w - 1) and p != 3:
+                    draw.line(1, char.RT)
+                elif x > 0 and y == 0 or x > 0 and p == 4:
+                    draw.line(1, char.V)
+                elif x == 0 and  p == 4:
+                    draw.line(1, char.JT)
+                    p = 0
+                else:
+                    draw.line(1, char.H)
+                p += 1
             print()
 
 
+
+
 def visualisation_maze(maze: MazeGrid) -> None:
-    visu: Visualisation = Visualisation(8,8,10,10)
-    visu.visu()
+    print(f"width {maze.width}")
+    print(f"height {maze.height}")
+    print(f"height {maze.height * maze.width}")
+
+    i: int = 0
+    visu: Visualisation = Visualisation(4,4, 5, 5)
+    cells: list[tuple[str, ...]] = list(maze.graph.keys())[i: i + maze.width]
+    #print(cells)
+    visu.visu(cells)
+    
+    # for x in range(maze.height):
+    #     cells: list[tuple[str, ...]] = list(maze.graph.keys())[i: i + maze.width]
+    #     #print(cells)
+    #     visu.visu(cells)
+    #     i += 8
