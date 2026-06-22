@@ -1,4 +1,4 @@
-from amazing.maze_generator import MazeGrid, get_maze
+from amazing.maze_generator.maze import MazeGrid, get_maze
 from amazing.visualisation import visualisation_maze
 
 

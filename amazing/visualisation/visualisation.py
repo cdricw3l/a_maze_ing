@@ -1,4 +1,4 @@
-from amazing.maze_generator.a_maze_ing import MazeGrid
+from amazing.maze_generator.maze import MazeGrid
 import sys
 import typing
 
@@ -212,11 +212,4 @@ def visualisation_maze(maze: MazeGrid) -> None:
     i: int = 0
     visu: Visualisation = Visualisation(4, 4, 5, 5)
     cells: list[tuple[str, ...]] = list(maze.graph.keys())[i: i + maze.width]
-    #print(cells)
     visu.visu(cells, len(cells) + 1)
-    
-    # for x in range(maze.height):
-    #     cells: list[tuple[str, ...]] = list(maze.graph.keys())[i: i + maze.width]
-    #     #print(cells)
-    #     visu.visu(cells)
-    #     i += 8
