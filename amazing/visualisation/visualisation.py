@@ -109,7 +109,6 @@ class Visualisation:
         for x in range(self.__m_h * self.__c_h):
             p = 0
             for y in range(self.__m_w * self.__c_w):
-
                 if x == 0 and y == 0 and p != 3:
                     draw.line(1,char.LT)
                 elif x == 0 and y == (self.__c_w * self.__m_w - 1):
