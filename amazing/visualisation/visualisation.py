@@ -1,5 +1,4 @@
 from amazing.maze_generator.a_maze_ing import MazeGrid
-from termcolor import colored, cprint
 import sys
 import typing
 
@@ -100,30 +99,110 @@ class Visualisation:
             print(sym)
             print()
 
+    @staticmethod
+    def first_line(cell: int, inter_cel: int) -> str:
+        line: str = ""
+
+        for i in range(cell):
+            x: int = 0
+            if i == 0:
+                line += Char.LT
+            elif i == cell - 1:
+                while x < inter_cel:
+                    line = line + Char.H
+                    x+=1
+                line += Char.RT
+            else:
+                while x < inter_cel:
+                    line = line + Char.H
+                    x+=1
+                if i < cell - 1:
+                    line = line + Char.JT
+        return line
+    
+    @staticmethod
+    def last_line(cell: int, inter_cel: int) -> str:
+        line: str = ""
+
+        for i in range(cell):
+            x: int = 0
+            if i == 0:
+                line += Char.LB
+            elif i == cell - 1:
+                while x < inter_cel:
+                    line = line + Char.H
+                    x+=1
+                line += Char.RB
+
+            else:
+                while x < inter_cel:
+                    line = line + Char.H
+                    x+=1
+                if i < cell - 1:
+                    line = line + Char.JB
+        return line
+    
+    @staticmethod
+    def midle_line(cell: int, inter_cel: int) -> str:
+        line: str = ""
+
+        for i in range(cell):
+            x: int = 0
+            if i == 0:
+                line += Char.V
+            elif i == cell - 1:
+                while x < inter_cel:
+                    line = line + " "
+                    x+=1
+                line += Char.V
+            else:
+                while x < inter_cel:
+                    line = line + " "
+                    x+=1
+                if i < cell - 1:
+                    line = line + Char.V
+        return line
+    
+    @staticmethod
+    def jonction_line(cell: int, inter_cel: int) -> str:
+        line: str = ""
+
+        for i in range(cell):
+            x: int = 0
+            if i == 0:
+                line += Char.JL
+            elif i == cell - 1:
+                while x < inter_cel:
+                    line = line + Char.H
+                    x+=1
+                line += Char.JR
+            else:
+                while x < inter_cel:
+                    line = line + Char.H
+                    x+=1
+                if i < cell - 1:
+                    line = line + Char.JM
+        return line
+
     def visu(self, cells: list[tuple[str, ...]]) -> None:
-        # symbs = [u'\u255a', u'\u2554', u'\u2569', u'\u2566', u'\u2560', u'\u2550', u'\u256c']
-        # for sym in symbs:
-        #     print(sym)
-        char: Char = Char()
-        draw: Drawing = Drawing()
-        for x in range(self.__m_h * self.__c_h):
-            p = 0
-            for y in range(self.__m_w * self.__c_w):
-                if x == 0 and y == 0 and p != 3:
-                    draw.line(1,char.LT)
-                elif x == 0 and y == (self.__c_w * self.__m_w - 1):
-                    draw.line(1, char.RT)
-                elif x == 0 and y == (self.__c_w * self.__m_w - 1) and p != 3:
-                    draw.line(1, char.RT)
-                elif x > 0 and y == 0 or x > 0 and p == 4:
-                    draw.line(1, char.V)
-                elif x == 0 and  p == 4:
-                    draw.line(1, char.JT)
-                    p = 0
-                else:
-                    draw.line(1, char.H)
-                p += 1
-            print()
+        for i in range(10):
+            if i == 0:
+                print(f"\033[92m{self.first_line(10 , 10)}")
+                print(self.midle_line(10 , 10))
+                # print(self.midle_line(10 , 10))
+                # print(self.midle_line(10 , 10))
+            elif i == 9:
+                print(self.midle_line(10 , 10))
+                print(self.midle_line(10 , 10))
+                print(self.midle_line(10 , 10))
+                print(self.midle_line(10 , 10))
+                print(self.last_line(10,10))
+            else:
+                print(self.midle_line(10 , 10))
+                print(self.midle_line(10 , 10))
+                print(self.midle_line(10 , 10))
+                print(self.jonction_line(10 , 10))
+
 
 
 
@@ -131,10 +210,10 @@ class Visualisation:
 def visualisation_maze(maze: MazeGrid) -> None:
     print(f"width {maze.width}")
     print(f"height {maze.height}")
-    print(f"height {maze.height * maze.width}")
+    print(f"height {maze.height * maze.width}\n")
 
     i: int = 0
-    visu: Visualisation = Visualisation(4,4, 5, 5)
+    visu: Visualisation = Visualisation(4, 4, 5, 5)
     cells: list[tuple[str, ...]] = list(maze.graph.keys())[i: i + maze.width]
     #print(cells)
     visu.visu(cells)
