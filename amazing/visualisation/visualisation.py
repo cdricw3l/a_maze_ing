@@ -93,12 +93,6 @@ class Visualisation:
         self.__m_h = m_h
         self.__m_w = m_w
 
-    def test(self):
-        symbs = [u'\u255a', u'\u2554', u'\u2569', u'\u2566', u'\u2560', u'\u2550', u'\u256c']
-        for sym in symbs:
-            print(sym)
-            print()
-
     @staticmethod
     def first_line(cell: int, inter_cel: int) -> str:
         line: str = ""
@@ -184,24 +178,27 @@ class Visualisation:
                     line = line + Char.JM
         return line
 
-    def visu(self, cells: list[tuple[str, ...]]) -> None:
-        for i in range(10):
+    def visu(self, cells: list[tuple[str, ...]], nb_cell: int) -> None:
+
+
+        for i in range(nb_cell):
             if i == 0:
-                print(f"\033[92m{self.first_line(10 , 10)}")
-                print(self.midle_line(10 , 10))
-                # print(self.midle_line(10 , 10))
-                # print(self.midle_line(10 , 10))
-            elif i == 9:
-                print(self.midle_line(10 , 10))
-                print(self.midle_line(10 , 10))
-                print(self.midle_line(10 , 10))
-                print(self.midle_line(10 , 10))
-                print(self.last_line(10,10))
-            else:
-                print(self.midle_line(10 , 10))
-                print(self.midle_line(10 , 10))
-                print(self.midle_line(10 , 10))
-                print(self.jonction_line(10 , 10))
+                print(f"\033[92m{self.first_line(nb_cell , 10)}")
+                print(self.midle_line(nb_cell , 10))
+                print(self.midle_line(nb_cell , 10))
+                print(self.midle_line(nb_cell , 10))
+                print(self.jonction_line(nb_cell , 10))
+            elif i == nb_cell - 1:
+                print(self.midle_line(nb_cell , 10))
+                print(self.midle_line(nb_cell , 10))
+                print(self.midle_line(nb_cell , 10))
+                print(self.last_line(nb_cell, 10))
+            elif i < nb_cell - 2:
+                print(self.midle_line(nb_cell , 10))
+                print(self.midle_line(nb_cell , 10))
+                print(self.midle_line(nb_cell , 10))
+                print(self.jonction_line(nb_cell , 10))
+
 
 
 
@@ -216,7 +213,7 @@ def visualisation_maze(maze: MazeGrid) -> None:
     visu: Visualisation = Visualisation(4, 4, 5, 5)
     cells: list[tuple[str, ...]] = list(maze.graph.keys())[i: i + maze.width]
     #print(cells)
-    visu.visu(cells)
+    visu.visu(cells, len(cells) + 1)
     
     # for x in range(maze.height):
     #     cells: list[tuple[str, ...]] = list(maze.graph.keys())[i: i + maze.width]
