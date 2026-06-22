@@ -1,6 +1,6 @@
 from collections import defaultdict
 from typing import DefaultDict, Iterable, List, Tuple, Set, Optional
-from parsing import *
+from amazing.parsing.parse_config import Config, parse_config, ConfigError
 import random
 import sys
 
@@ -166,16 +166,14 @@ def run_algorithm(config: Config) -> MazeGrid:
     return maze
 
 
-def main() -> None:
+def get_maze(config_file: str) -> MazeGrid:
     try:
-        config: Config = parse_config("config/config.txt")
+        config: Config = parse_config(config_file)
     except ConfigError as e:
         print(f"{e}")
         sys.exit(1)
     maze: MazeGrid = run_algorithm(config)
-
-    for cell in maze.graph:
-        print(f"cell: {cell} value: {maze.graph[cell]}")
+    return maze
 
 if __name__ == '__main__':
-    main()
+    get_maze()
