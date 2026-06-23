@@ -83,122 +83,53 @@ class Visualisation:
         self.__m_w = maze.width
         self.__struct  = maze_structure
 
-    @staticmethod
-    def first_line(cell: int, inter_cel: int) -> str:
-        line: str = ""
-
-        for i in range(cell):
-            x: int = 0
-            if i == 0:
-                line += Char.LT
-            elif i == cell - 1:
-                while x < inter_cel:
-                    line = line + Char.H
-                    x+=1
-                line += Char.RT
-            else:
-                while x < inter_cel:
-                    line = line + Char.H
-                    x+=1
-                if i < cell - 1:
-                    line = line + Char.JT
-        return line
-    
-    @staticmethod
-    def last_line(cell: int, inter_cel: int) -> str:
-        line: str = ""
-
-        for i in range(cell):
-            x: int = 0
-            if i == 0:
-                line += Char.LB
-            elif i == cell - 1:
-                while x < inter_cel:
-                    line = line + Char.H
-                    x+=1
-                line += Char.RB
-
-            else:
-                while x < inter_cel:
-                    line = line + Char.H
-                    x+=1
-                if i < cell - 1:
-                    line = line + Char.JB
-        return line
-    
-    @staticmethod
-    def midle_line(cell: int, inter_cel: int) -> str:
-        line: str = ""
-
-        for i in range(cell):
-            x: int = 0
-            if i == 0:
-                line += Char.V
-            elif i == cell - 1:
-                while x < inter_cel:
-                    line = line + " "
-                    x+=1
-                line += Char.V
-            else:
-                while x < inter_cel:
-                    line = line + " "
-                    x+=1
-                if i < cell - 1:
-                    line = line + Char.V
-        return line
-    
-    @staticmethod
-    def jonction_line(cell: int, inter_cel: int) -> str:
-        line: str = ""
-
-        for i in range(cell):
-            x: int = 0
-            if i == 0:
-                line += Char.JL
-            elif i == cell - 1:
-                while x < inter_cel:
-                    line = line + Char.H
-                    x+=1
-                line += Char.JR
-            else:
-                while x < inter_cel:
-                    line = line + Char.H
-                    x+=1
-                if i < cell - 1:
-                    line = line + Char.JM
-        return line
 
     @staticmethod
     def get_the_bit(value: int, direction: int) -> int:
         match direction:
-            case 0:
+            case "N":
                 return (value >> 3) & 1
-            case 1:
+            case "E":
                 return (value >> 2) & 1
-            case 2:
+            case "S":
                 return (value >> 1) & 1
-            case 3:
-                return (value >> 1) & 1
+            case "W":
+                return (value >> 0) & 1
+
+    def print_top_line(self, cell: tuple[float, ...], wall: int) -> None:
+        line : str = ""
+        if cell[0] == 0 and cell[1] == 0 :
+            line = line + Char.LT
+        elif cell[1] == 0 and cell[0] != 0:
+            if self.get_the_bit(wall, "W") == 0:
+                line = line + Char.JT
+        for i in range(self.__c_w):
+            line = line + Char.H
+        if cell[0] ==  self.__m_w - 1 and cell[1] == 0 :
+            line = line + Char.RT
+        print(line, end="")
 
     def visu(self) -> None:
         i: int = 0
         #for x in range(self.__m_h):
         for x in range(1):
+            # new dict (cell): wall
             new_dict = {cell:self.__struct.get(cell) for cell in self.__struct if cell[1] == x}
-            for y in range(4):
+            print(new_dict)
+            for y in range(1):
                 for cell in new_dict:
                     bit : int = self.get_the_bit(new_dict.get(cell),y)
                     match y:
-                        case 0:
-                            s = "N"
-                        case 1:
-                            s = "E"
-                        case 2:
-                            s = "S"
                         case 3:
+                            s = "N"
+                        case 2:
+                            s = "E"
+                        case 1:
+                            s = "S"
+                        case 0:
                             s = "W"
-                    print (f"cell:{cell}, bit: {format(new_dict.get(cell),'b')}, wall:{s} {"WALL" if bit == 1 else "NO WALL"}")
-
+                    ##print (f"cell:{cell}, bit: {format(new_dict.get(cell),'b')}, wall: {s},  {"WALL" if bit == 0 else "NO WALL"}")
+                    self.print_top_line(cell, new_dict.get(cell) )
 
 
 def get_bits(cell: tuple[float, ...], open_neighbors: list[Cell]) -> int :
@@ -258,14 +189,22 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 def visualisation_maze(maze: MazeGrid) -> None:
     
 
+    # i = 6
 
-    i : int = 0
+    # print(format(i, 'b'))
+    # print((i >> 0) & 1)
+    # print((i >> 1) & 1)
+    # print((i >> 2) & 1)
+    # print((i >> 3) & 1)
     
-
+    
+    i : int = 0
     maze_struct: dict[tuple[float, ...]: int] = get_output(maze)
+    new_dict = {cell:maze_struct.get(cell) for cell in maze_struct if cell[1] == 0}
     # for o in maze_struct:
     #     print(f"cell: {o}, wall: {maze_struct.get(o), format(maze_struct.get(o), 'b')}, neighbour: {maze.graph.get(o)}")
 
-    visu: Visualisation = Visualisation(4,4, maze, maze_struct)
+    visu: Visualisation = Visualisation(10,10, maze, maze_struct)
     visu.visu()
+    # print(maze.width)
     
