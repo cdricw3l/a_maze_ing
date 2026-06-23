@@ -107,6 +107,15 @@ class Visualisation:
             line = line + Char.H
         if cell[0] ==  self.__m_w - 1 and cell[1] == 0 :
             line = line + Char.RT
+            line = line + "\n"
+        print(line, end="")
+    
+    def print_middleline(self, cell: tuple[float, ...], wall: int) -> None:
+        line: str = ""
+        if cell[0] == 0 or cell[0] == self.__m_w - 1:
+            line = line + Char.V
+        for i in range(self.__c_w):
+            line = line + " "
         print(line, end="")
 
     def visu(self) -> None:
@@ -116,20 +125,23 @@ class Visualisation:
             # new dict (cell): wall
             new_dict = {cell:self.__struct.get(cell) for cell in self.__struct if cell[1] == x}
             print(new_dict)
-            for y in range(1):
-                for cell in new_dict:
-                    bit : int = self.get_the_bit(new_dict.get(cell),y)
-                    match y:
-                        case 3:
-                            s = "N"
-                        case 2:
-                            s = "E"
-                        case 1:
-                            s = "S"
-                        case 0:
-                            s = "W"
-                    ##print (f"cell:{cell}, bit: {format(new_dict.get(cell),'b')}, wall: {s},  {"WALL" if bit == 0 else "NO WALL"}")
-                    self.print_top_line(cell, new_dict.get(cell) )
+            for cell in new_dict:
+                #bit : int = self.get_the_bit(new_dict.get(cell),y)
+                # match y:
+                #     case 3:
+                #         s = "N"
+                #     case 2:
+                #         s = "E"
+                #     case 1:
+                #         s = "S"
+                #     case 0:
+                #         s = "W"
+                ##print (f"cell:{cell}, bit: {format(new_dict.get(cell),'b')}, wall: {s},  {"WALL" if bit == 0 else "NO WALL"}")
+                self.print_top_line(cell, new_dict.get(cell))
+            for cell in new_dict:
+                self.print_middleline(cell, new_dict.get(cell))
+                
+                
 
 
 def get_bits(cell: tuple[float, ...], open_neighbors: list[Cell]) -> int :
@@ -206,5 +218,7 @@ def visualisation_maze(maze: MazeGrid) -> None:
 
     visu: Visualisation = Visualisation(10,10, maze, maze_struct)
     visu.visu()
+
+
     # print(maze.width)
     
