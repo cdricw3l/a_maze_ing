@@ -212,4 +212,5 @@ def visualisation_maze(maze: MazeGrid) -> None:
     i: int = 0
     visu: Visualisation = Visualisation(4, 4, 5, 5)
     cells: list[tuple[str, ...]] = list(maze.graph.keys())[i: i + maze.width]
-    visu.visu(cells, len(cells) + 1)
+    for cell in cells:
+        print(cell, maze.graph["cell"])

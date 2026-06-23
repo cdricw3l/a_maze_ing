@@ -2,12 +2,12 @@ NAME=a_maze_ing.py
 FLAKE=flake8
 MYPY=mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 VENV=venv
-
+CONFIG= config/config.txt
 venv:
 	uv  venv $(VENV)
 
 run:
-	@python3 $(NAME)
+	@python3 $(NAME) $(CONFIG)
 
 lt: 
 	@$(MYPY)
