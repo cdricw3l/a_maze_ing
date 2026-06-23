@@ -221,22 +221,18 @@ def get_bits(cell: tuple[float, ...], open_neighbors: list[Cell]) -> int :
     # print(f"west: {west}")
     # print(f"neghbour {open_neighbors}")
     if west in open_neighbors:
-        print("acive 1")
         value = value | (1 << 0)
     #this mask active the second bit for the South wall
     # if the South variable tuple is on neighbour list this bit is activate
     if sud in open_neighbors:
-        print("acive 2")
         value = value | (1 << 1)
     #this mask active the third bit for the Est wall
     # if the Est variable tuple is on neighbour list this bit is activate
     if est in open_neighbors:
-        print("acive 3")
         value = value | (1 << 2)
     #this mask active the fourth bit for the Nord wall
     # if the Nord variable tuple is on neighbour list this bit is activate
     if nord in open_neighbors:
-        print("acive 4")
         value = value | (1 << 3)
 
     return value
@@ -261,12 +257,15 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
     return output
 
 def visualisation_maze(maze: MazeGrid) -> None:
-    print(f"width {maze.width}")
-    print(f"height {maze.height}")
-    print(f"height {maze.height * maze.width}\n")
+    
+    i : int = 0
+    
 
     output: dict[tuple[float, ...]: int] = get_output(maze)
     for o in output:
-        print(f"cell: {o}, wall: {output.get(o), format(output.get(o), 'b')}, neighbour: {maze.graph.get(o)}")
+        print( o, output.get(o))
+        #print(f"cell: {o}, wall: {output.get(o), format(output.get(o), 'b')}, neighbour: {maze.graph.get(o)}")
 
-    
+    print(f"width {maze.width}")
+    print(f"height {maze.height}")
+    print(f"height {maze.height * maze.width}\n")
