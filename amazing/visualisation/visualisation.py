@@ -179,7 +179,7 @@ class Visualisation:
                     line = line + Char.JM
         return line
 
-    def visu(self, cells: list[tuple[str, ...]], nb_cell: int) -> None:
+    def visu(self, out: list[tuple[str, ...]], nb_cell: int) -> None:
 
 
         for i in range(nb_cell):
@@ -258,14 +258,17 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 
 def visualisation_maze(maze: MazeGrid) -> None:
     
+
+    visu: Visualisation = Visualisation(4,4, maze.height, maze.width)
+
     i : int = 0
     
 
     output: dict[tuple[float, ...]: int] = get_output(maze)
     for o in output:
-        print( o, output.get(o))
-        #print(f"cell: {o}, wall: {output.get(o), format(output.get(o), 'b')}, neighbour: {maze.graph.get(o)}")
+        print(f"cell: {o}, wall: {output.get(o), format(output.get(o), 'b')}, neighbour: {maze.graph.get(o)}")
 
     print(f"width {maze.width}")
     print(f"height {maze.height}")
-    print(f"height {maze.height * maze.width}\n")
+    print(f"entry {maze.entry}")
+    print(f"exit {maze.exit}")

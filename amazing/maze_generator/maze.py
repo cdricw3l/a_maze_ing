@@ -18,9 +18,11 @@ class MazeGrid:
     validated by the caller.
     """
 
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, entry: int, exit: int) -> None:
         self.width = width
         self.height = height
+        self.entry = entry
+        self.exit = exit
         self.graph: DefaultDict[Cell, List[Cell]] = defaultdict(list)
         self._initialize_cells()
 
@@ -145,7 +147,7 @@ class MazeGrid:
 def run_algorithm(config: Config) -> MazeGrid:
     if config.seed is not None:
         random.seed(config.seed)
-    maze = MazeGrid(config.width, config.height)
+    maze = MazeGrid(config.width, config.height, config.entry, config.exit)
     visited: Set[Cell] = maze.forty_two_logo(maze.width, maze.height)
     visited.add(config.entry)
     stack: List[Cell] = [config.entry]

@@ -10,6 +10,6 @@ if __name__ == "__main__":
     if len(arg) != 1:
         Color.RED("Configuration path is missing")
     else:
-        maze : MazeGrid = get_maze("config/config.txt")
+        maze : MazeGrid = get_maze(arg[0])
         visualisation_maze(maze)
     

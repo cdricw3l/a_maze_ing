@@ -1,6 +1,11 @@
 avoid to create __pycache__: export PYTHONDONTWRITEBYTECODE=1
 
 
+to do:
+We have to check if th entry is valide and the exit also
+
+
+
 0000 = NESW
 
 0001 = 1 

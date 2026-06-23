@@ -110,18 +110,19 @@ def _parse_coord(value: str) -> Tuple[int, int]:
     return x, y
 
 
+
 def validate_entry(
     value: Optional[str], width: int, height: int
 ) -> Tuple[int, int]:
     if value is None:
         raise ConfigError("ENTRY is required")
     x, y = _parse_coord(value)
+    print(x, y)
     if not (0 <= x < width and 0 <= y < height):
         msg = (f"ENTRY ({x}, {y}) out of bounds "
                f"for width={width}, height={height}")
         raise ConfigError(msg)
     return x, y
-
 
 def validate_exit(
     value: Optional[str], width: int, height: int
