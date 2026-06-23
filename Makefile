@@ -22,7 +22,8 @@ fclean: clean
 	rm -rf $(VENV)
 
 COM= generic_com
-git: clean
+git:
+	@make -i -s lt
 	git add .
 	git commit -m  $(COM)
 	git push origin $(shell git branch --show-current)
