@@ -1,0 +1,1 @@
+https://www.sdss.org/dr19/tutorials/using_bitmasks/

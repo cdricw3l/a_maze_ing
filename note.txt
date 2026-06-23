@@ -1,1 +1,10 @@
 avoid to create __pycache__: export PYTHONDONTWRITEBYTECODE=1
+
+
+0000 = NESW
+
+0011 = 00SE
+
+
+(0, 0) [(0, 1)] = 0100
+(0, 1) [(0, 0), (0, 2)] = 0101

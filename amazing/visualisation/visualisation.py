@@ -1,5 +1,6 @@
-from amazing.maze_generator.maze import MazeGrid
+from amazing.maze_generator.maze import MazeGrid, Cell
 import sys
+from collections import defaultdict
 import typing
 
 def prRed(s): print("\033[91m {}\033[00m".format(s))
@@ -201,7 +202,53 @@ class Visualisation:
 
 
 
+def get_bits(cell: tuple[float, ...], open_neighbors: list[Cell]) -> int :
 
+
+    nord: tuple[float, ...] = (cell[0] - 1 , cell[1]) 
+    est: tuple[float, ...] = (cell[0] , cell[1] + 1) 
+    sud: tuple[float, ...] = (cell[0] + 1 , cell[1])
+    west: tuple[float, ...] = (cell[0] , cell[1] - 1)
+
+
+
+
+    # the binary value of 0 is 0000
+    value: int = 0
+
+    #this mask active the first bit for the West wall
+    # if the West variable tuple is on neighbour list this bit is activate
+
+    if west in open_neighbors:
+        value = value | (1 << 0)
+    #this mask active the second bit for the South wall
+    # if the South variable tuple is on neighbour list this bit is activate
+    if sud in open_neighbors:
+        value = value | (1 << 1)
+    #this mask active the third bit for the Est wall
+    # if the Est variable tuple is on neighbour list this bit is activate
+    if est in open_neighbors:
+        value = value | (1 << 2)
+    #this mask active the fourth bit for the Nord wall
+    # if the Nord variable tuple is on neighbour list this bit is activate
+    if nord in open_neighbors:
+        value = value | (1 << 3)
+
+    return value
+     
+
+def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
+    """ """
+    graph: defaultdict[Cell, list[Cell]] = maze.graph
+    output: dict[tuple[float, ...]: int] = {}
+    for cell in graph:
+        open_neighbors: list[Cell] = graph.get(cell)
+        key: tuple[float, ...] = cell
+        value: int = get_bits(key, open_neighbors)
+        output.update({key:value})
+        print(output)
+        print(format(output.get(cell), 'b'))
+        assert( 1 == 2)
 
 
 def visualisation_maze(maze: MazeGrid) -> None:
@@ -209,8 +256,5 @@ def visualisation_maze(maze: MazeGrid) -> None:
     print(f"height {maze.height}")
     print(f"height {maze.height * maze.width}\n")
 
-    i: int = 0
-    visu: Visualisation = Visualisation(4, 4, 5, 5)
-    cells: list[tuple[str, ...]] = list(maze.graph.keys())[i: i + maze.width]
-    for cell in cells:
-        print(cell, maze.graph["cell"])
+    print(format(get_bits((0, 0) ,[(0, 1)]), 'b'))
+
