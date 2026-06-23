@@ -1,5 +1,4 @@
 from amazing.maze_generator.maze import MazeGrid, Cell
-import sys
 from collections import defaultdict
 import typing
 
@@ -69,17 +68,6 @@ class Char:
     H: typing.Literal[True] = '═'
     V: typing.Literal[True] = '║'
 
-class Drawing:
-
-
-    def __init__(self):
-        self.__char = {"DOUBLE_VERTI_PIPE" : u'\u2551', "DOUBLE_RIGHT_TOP" : u'\u2557', "DOUBLE_LEFT_TOP" : u'\u2554',
-                       "DOUBLE_LEFT_BOTTOM" : u'\u255a', "DOUBLE_RIGHT_BOTTOM" :u'\u255d', "DOUBLE_HORIZ_PIPE" : u'\u2550', "joint": u'\u2566'}
-    
-    def line(self, size: int, c: str):
-        for i in range(size):
-            print(c, end="", flush=True)
-
 
 class Visualisation:
     __c_w: float
@@ -88,11 +76,12 @@ class Visualisation:
     __m_w: float
 
 
-    def __init__(self, c_h: float, c_w: float, m_h: float, m_w: float):
+    def __init__(self, c_h: float, c_w: float, maze: MazeGrid, maze_structure: dict[tuple[float, ...]: int]):
         self.__c_h = c_h
         self.__c_w = c_w
-        self.__m_h = m_h
-        self.__m_w = m_w
+        self.__m_h = maze.height
+        self.__m_w = maze.width
+        self.__struct  = maze_structure
 
     @staticmethod
     def first_line(cell: int, inter_cel: int) -> str:
@@ -179,36 +168,46 @@ class Visualisation:
                     line = line + Char.JM
         return line
 
-    def visu(self, out: list[tuple[str, ...]], nb_cell: int) -> None:
+    @staticmethod
+    def get_the_bit(value: int, direction: int) -> int:
+        match direction:
+            case 0:
+                return (value >> 3) & 1
+            case 1:
+                return (value >> 2) & 1
+            case 2:
+                return (value >> 1) & 1
+            case 3:
+                return (value >> 1) & 1
 
-
-        for i in range(nb_cell):
-            if i == 0:
-                print(f"\033[92m{self.first_line(nb_cell , 10)}")
-                print(self.midle_line(nb_cell , 10))
-                print(self.midle_line(nb_cell , 10))
-                print(self.midle_line(nb_cell , 10))
-                print(self.jonction_line(nb_cell , 10))
-            elif i == nb_cell - 1:
-                print(self.midle_line(nb_cell , 10))
-                print(self.midle_line(nb_cell , 10))
-                print(self.midle_line(nb_cell , 10))
-                print(self.last_line(nb_cell, 10))
-            elif i < nb_cell - 2:
-                print(self.midle_line(nb_cell , 10))
-                print(self.midle_line(nb_cell , 10))
-                print(self.midle_line(nb_cell , 10))
-                print(self.jonction_line(nb_cell , 10))
+    def visu(self) -> None:
+        i: int = 0
+        #for x in range(self.__m_h):
+        for x in range(1):
+            new_dict = {cell:self.__struct.get(cell) for cell in self.__struct if cell[1] == x}
+            for y in range(4):
+                for cell in new_dict:
+                    bit : int = self.get_the_bit(new_dict.get(cell),y)
+                    match y:
+                        case 0:
+                            s = "N"
+                        case 1:
+                            s = "E"
+                        case 2:
+                            s = "S"
+                        case 3:
+                            s = "W"
+                    print (f"cell:{cell}, bit: {format(new_dict.get(cell),'b')}, wall:{s} {"WALL" if bit == 1 else "NO WALL"}")
 
 
 
 def get_bits(cell: tuple[float, ...], open_neighbors: list[Cell]) -> int :
 
 
-    nord: tuple[float, ...] = (cell[0] - 1 , cell[1]) 
-    est: tuple[float, ...] = (cell[0] , cell[1] + 1) 
-    sud: tuple[float, ...] = (cell[0] + 1 , cell[1])
-    west: tuple[float, ...] = (cell[0] , cell[1] - 1)
+    nord: tuple[float, ...] = (cell[0] , cell[1] - 1) 
+    est: tuple[float, ...] = (cell[0] + 1 , cell[1]) 
+    sud: tuple[float, ...] = (cell[0] , cell[1] + 1)
+    west: tuple[float, ...] = (cell[0] - 1 , cell[1])
 
     # the binary value of 0 is 0000
     value: int = 0
@@ -259,16 +258,14 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 def visualisation_maze(maze: MazeGrid) -> None:
     
 
-    visu: Visualisation = Visualisation(4,4, maze.height, maze.width)
 
     i : int = 0
     
 
-    output: dict[tuple[float, ...]: int] = get_output(maze)
-    for o in output:
-        print(f"cell: {o}, wall: {output.get(o), format(output.get(o), 'b')}, neighbour: {maze.graph.get(o)}")
+    maze_struct: dict[tuple[float, ...]: int] = get_output(maze)
+    # for o in maze_struct:
+    #     print(f"cell: {o}, wall: {maze_struct.get(o), format(maze_struct.get(o), 'b')}, neighbour: {maze.graph.get(o)}")
 
-    print(f"width {maze.width}")
-    print(f"height {maze.height}")
-    print(f"entry {maze.entry}")
-    print(f"exit {maze.exit}")
+    visu: Visualisation = Visualisation(4,4, maze, maze_struct)
+    visu.visu()
+    
