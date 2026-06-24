@@ -56,18 +56,34 @@ test = [u'\u2502',   #  0x00b3 -> BOX DRAWINGS LIGHT VERTICAL
 
 
 class Char:
-    LT: typing.Literal[True] = '╔'
-    LB: typing.Literal[True] = '╚' 
-    RT: typing.Literal[True] = '╗' 
-    RB: typing.Literal[True] = '╝' 
-    JT: typing.Literal[True] = '╦'
-    JB: typing.Literal[True] = '╩'
-    JL: typing.Literal[True] = '╠'
-    JR: typing.Literal[True] = '╣'
-    JM: typing.Literal[True] = '╬'
-    H: typing.Literal[True] = '═'
-    V: typing.Literal[True] = '║'
+    # LT: typing.Literal[True] = '╔'
+    # LB: typing.Literal[True] = '╚' 
+    # RT: typing.Literal[True] = '╗' 
+    # RB: typing.Literal[True] = '╝' 
+    # JT: typing.Literal[True] = '╦'
+    # JB: typing.Literal[True] = '╩'
+    # JL: typing.Literal[True] = '╠'
+    # JR: typing.Literal[True] = '╣'
+    # JM: typing.Literal[True] = '╬'
+    # H: typing.Literal[True] = '═'
+    # V: typing.Literal[True] = '║'
 
+    NESW:typing.Literal[True] = "┼"
+    NES: typing.Literal[True] ='├'
+    NEW:typing.Literal[True] = '┴'
+    NSW:typing.Literal[True] = '┤'
+    ESW: typing.Literal[True] ='┬'
+    NE: typing.Literal[True] ='└'
+    NS: typing.Literal[True] ='│'
+    NW: typing.Literal[True] ='┘'
+    ES:typing.Literal[True] = '┌'
+    EW:typing.Literal[True] = '─'
+    SW:typing.Literal[True] = '┐'
+    N: typing.Literal[True] ='╵'
+    E:typing.Literal[True] = '╶'
+    S: typing.Literal[True] ='╷'
+    W:typing.Literal[True] = '╴'
+    EMPTY:typing.Literal[True] = '.'
 
 class Visualisation:
     __c_w: float
@@ -95,53 +111,53 @@ class Visualisation:
                 return (value >> 1) & 1
             case "W":
                 return (value >> 0) & 1
-
-    def print_top_line(self, cell: tuple[float, ...], wall: int) -> None:
+            
+    def get_fist_line(self, cell: tuple[str], wall: int) -> str  :
         line : str = ""
-        if cell[0] == 0 and cell[1] == 0 :
+        if cell[0] == 0 and cell[1] == 0:
             line = line + Char.LT
-        elif cell[1] == 0 and cell[0] != 0:
+            for x in range(self.__c_w):
+                    line = line + Char.H
+        elif cell[0] == self.__m_w - 1 and cell[1] == 0:
             if self.get_the_bit(wall, "W") == 0:
                 line = line + Char.JT
-        for i in range(self.__c_w):
-            line = line + Char.H
-        if cell[0] ==  self.__m_w - 1 and cell[1] == 0 :
-            line = line + Char.RT
-            line = line + "\n"
-        print(line, end="")
-    
-    def print_middleline(self, cell: tuple[float, ...], wall: int) -> None:
-        line: str = ""
-        if cell[0] == 0 or cell[0] == self.__m_w - 1:
-            line = line + Char.V
-        for i in range(self.__c_w):
-            line = line + " "
-        print(line, end="")
+            for x in range(self.__c_w):
+                line = line + Char.H
+            line = line +  Char.RT
+        elif cell[1] == 0:
+            if self.get_the_bit(wall, "W") == 0:
+                line = line + Char.JT
+            for x in range(self.__c_w):
+                    line = line + Char.H
+        print(line, flush=True, end="")
 
-    def visu(self) -> None:
-        i: int = 0
-        #for x in range(self.__m_h):
-        for x in range(1):
-            # new dict (cell): wall
-            new_dict = {cell:self.__struct.get(cell) for cell in self.__struct if cell[1] == x}
-            print(new_dict)
-            for cell in new_dict:
-                #bit : int = self.get_the_bit(new_dict.get(cell),y)
-                # match y:
-                #     case 3:
-                #         s = "N"
-                #     case 2:
-                #         s = "E"
-                #     case 1:
-                #         s = "S"
-                #     case 0:
-                #         s = "W"
-                ##print (f"cell:{cell}, bit: {format(new_dict.get(cell),'b')}, wall: {s},  {"WALL" if bit == 0 else "NO WALL"}")
-                self.print_top_line(cell, new_dict.get(cell))
-            for cell in new_dict:
-                self.print_middleline(cell, new_dict.get(cell))
-                
-                
+    def get_middle_line(self, cell: tuple[str], wall: int):
+        line : str = ""
+        if cell[0] == 0:
+            line = line + Char.V
+            for x in range(self.__c_w):
+                    line = line + " "
+        else:
+            if self.get_the_bit(wall, "W") == 0:
+                line = line + Char.V
+            for x in range(self.__c_w):
+                    line = line + " "
+            if cell[0] == self.__m_w - 1 :
+                    line = line + Char.V
+        print(line, flush=True, end="")
+    
+    def get_top_line(self, cell: tuple[str], wall: int) -> str:
+        line : str = ""
+        if cell[0] == 0:
+            if self.get_the_bit(wall, "N") == 0:
+                line = line + Char.JL
+                for x in range(self.__c_w):
+                    line = line + Char.V
+            else:
+                line = line + Char.V
+                for x in range(self.__c_w):
+                    line = line + " "
+                 
 
 
 def get_bits(cell: tuple[float, ...], open_neighbors: list[Cell]) -> int :
@@ -157,11 +173,6 @@ def get_bits(cell: tuple[float, ...], open_neighbors: list[Cell]) -> int :
 
     #this mask active the first bit for the West wall
     # if the West variable tuple is on neighbour list this bit is activate
-    # print(f"nord: {nord}")
-    # print(f"est: {est}")
-    # print(f"sud: {sud}")
-    # print(f"west: {west}")
-    # print(f"neghbour {open_neighbors}")
     if west in open_neighbors:
         value = value | (1 << 0)
     #this mask active the second bit for the South wall
@@ -198,27 +209,22 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
     
     return output
 
+def vertice_dict(width: int, heigh: int) -> dict[tuple[int]: list[tuple[int, ...]]]:
+
+    vertice: dict[tuple[int, ...]: list[tuple[int, ...]]] = {}
+    for x in range(heigh + 1):
+         for y in range(width + 1):
+              cell: tuple[int, ...] = (y, x)
+              ne: tuple[int, ...] = (y, x - 1)
+              se: tuple[int, ...] = (y , x)
+              sw: tuple[int, ...] = (y -1 , x)
+              nw: tuple[int, ...] = (y - 1 , x -1)
+              vertice.update({cell:list[ne,se, sw, nw]})
+    return vertice
+
 def visualisation_maze(maze: MazeGrid) -> None:
     
 
-    # i = 6
-
-    # print(format(i, 'b'))
-    # print((i >> 0) & 1)
-    # print((i >> 1) & 1)
-    # print((i >> 2) & 1)
-    # print((i >> 3) & 1)
-    
-    
-    i : int = 0
-    maze_struct: dict[tuple[float, ...]: int] = get_output(maze)
-    new_dict = {cell:maze_struct.get(cell) for cell in maze_struct if cell[1] == 0}
-    # for o in maze_struct:
-    #     print(f"cell: {o}, wall: {maze_struct.get(o), format(maze_struct.get(o), 'b')}, neighbour: {maze.graph.get(o)}")
-
-    visu: Visualisation = Visualisation(10,10, maze, maze_struct)
-    visu.visu()
-
-
-    # print(maze.width)
-    
+    sommet = vertice_dict(maze.width, maze.height)
+    for s in sommet:
+        print(s, sommet.get(s))
