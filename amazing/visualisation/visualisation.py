@@ -1,6 +1,6 @@
 from amazing.maze_generator.maze import MazeGrid, Cell
 from collections import defaultdict
-import typing
+from typing import DefaultDict, Iterable, List, Tuple, Set, Optional, Literal
 
 def prRed(s): print("\033[91m {}\033[00m".format(s))
 def prGreen(s): print("\033[92m {}\033[00m".format(s), end= " ")
@@ -68,22 +68,22 @@ class Char:
     # H: typing.Literal[True] = '═'
     # V: typing.Literal[True] = '║'
 
-    NESW:typing.Literal[True] = "┼"
-    NES: typing.Literal[True] ='├'
-    NEW:typing.Literal[True] = '┴'
-    NSW:typing.Literal[True] = '┤'
-    ESW: typing.Literal[True] ='┬'
-    NE: typing.Literal[True] ='└'
-    NS: typing.Literal[True] ='│'
-    NW: typing.Literal[True] ='┘'
-    ES:typing.Literal[True] = '┌'
-    EW:typing.Literal[True] = '─'
-    SW:typing.Literal[True] = '┐'
-    N: typing.Literal[True] ='╵'
-    E:typing.Literal[True] = '╶'
-    S: typing.Literal[True] ='╷'
-    W:typing.Literal[True] = '╴'
-    EMPTY:typing.Literal[True] = '.'
+    NESW:Literal[True] = "┼"
+    NES: Literal[True] ='├'
+    NEW:Literal[True] = '┴'
+    NSW: Literal[True] = '┤'
+    ESW: Literal[True] ='┬'
+    NE: Literal[True] ='└'
+    NS: Literal[True] ='│'
+    NW: Literal[True] ='┘'
+    ES:Literal[True] = '┌'
+    EW:Literal[True] = '─'
+    SW:Literal[True] = '┐'
+    N: Literal[True] ='╵'
+    E:Literal[True] = '╶'
+    S: Literal[True] ='╷'
+    W:Literal[True] = '╴'
+    EMPTY: Literal[True] = '.'
 
 
 
@@ -112,19 +112,28 @@ class Visualisation:
                 cell: tuple[int, ...] = (y, x)
                 nw: tuple[int, ...] = (y - 1 , x -1)
                 se: tuple[int, ...] = (y , x)
-                vertice.update({cell:list[nw, se]})
+                vertice.update({cell:list([nw, se])})
         return vertice
     
-    def get_vertice_structure (vertice: tuple[int], adjoining_rooms: list[tuple[int, ...]]):
+    def get_vertice_structure(self, vertice: tuple[int, ...], adjoining_rooms: List[tuple[int, ...]]):
+        # w_cell: tuple[int] = tuple(adjoining_rooms[0][0], adjoining_rooms[0][1] + 1)
+        # n_cell: tuple[int] = tuple(adjoining_rooms[0][0] + 1, adjoining_rooms[0][1])
+        # e_cell: tuple[int] = tuple(adjoining_rooms[1][0] , adjoining_rooms[1][1] - 1)
+        # s_cell: tuple[int] = tuple(adjoining_rooms[1][0] - 1 , adjoining_rooms[1][1])
+
+        for a in adjoining_rooms:
+            print(a[0])
+        #print(w_cell, n_cell,e_cell,s_cell)
+        
 
     def display_maze(self) -> None:
         vertices: dict[tuple[int]: list[tuple[int, ...]]] = self.vertice_dict()
         for x in vertices:
-            print(x, vertices.get(x))
-        
+            # self.get_vertice_structure(vertices, vertices.get(x))
+            print(list(vertices.get(x)))
 
 
-def get_bits(cell: tuple[float, ...], open_neighbors: list[Cell]) -> int :
+def get_bits(cell: tuple[float, ...], open_neighbors: List[Cell]) -> int :
 
 
     west: tuple[float, ...] = (cell[0] - 1 , cell[1])
@@ -164,7 +173,7 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
     exemple: WSEN -> 0000 -> all the wall are open 
     exemple: WSEN -> 1111 -> all the wall are closed 
     """
-    graph: defaultdict[Cell, list[Cell]] = maze.graph
+    graph: defaultdict[Cell, List[Cell]] = maze.graph
     output: dict[tuple[float, ...]: int] = {}
     for cell in graph:
         open_neighbors: list[Cell] = graph.get(cell)
@@ -179,4 +188,8 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 def visualisation_maze(maze: MazeGrid) -> None:
     
     visualiser: Visualisation = Visualisation(4,4, maze, get_output(maze))
-    visualiser.display_maze()
+    o = get_output(maze)
+    for i in o:
+        print(i[0], i[1])
+    
+    #visualiser.display_maze()
