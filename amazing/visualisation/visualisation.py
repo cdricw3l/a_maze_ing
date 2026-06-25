@@ -55,7 +55,7 @@ test = [u'\u2502',   #  0x00b3 -> BOX DRAWINGS LIGHT VERTICAL
         u'\u250c' ]  #  0x00da -> BOX DRAWINGS LIGHT DOWN AND RIGHT
 
 
-class Char:
+class Char_set:
     # LT: typing.Literal[True] = '╔'
     # LB: typing.Literal[True] = '╚' 
     # RT: typing.Literal[True] = '╗' 
@@ -67,33 +67,26 @@ class Char:
     # JM: typing.Literal[True] = '╬'
     # H: typing.Literal[True] = '═'
     # V: typing.Literal[True] = '║'
+    
+    __char_set: dict[str,str]
+    def __init__(self):
+        self.__char_set: dict[str,str] = {
+            "NESW" : "┼", "NES" :'├', "NEW" :'┴', "NSW": '┤', "ESW": '┬', "NE": '└',
+            "NS": '│', "NW": '┘', "ES": '┌', "EW": '─', "SW": '┐', "N": '╵', "E":'╶',
+            "S": '╷',"W":'╴', "EMPTY": '.'}
 
-    NESW:Literal[True] = "┼"
-    NES: Literal[True] ='├'
-    NEW:Literal[True] = '┴'
-    NSW: Literal[True] = '┤'
-    ESW: Literal[True] ='┬'
-    NE: Literal[True] ='└'
-    NS: Literal[True] ='│'
-    NW: Literal[True] ='┘'
-    ES:Literal[True] = '┌'
-    EW:Literal[True] = '─'
-    SW:Literal[True] = '┐'
-    N: Literal[True] ='╵'
-    E:Literal[True] = '╶'
-    S: Literal[True] ='╷'
-    W:Literal[True] = '╴'
-    EMPTY: Literal[True] = '.'
+    def get_char(self, code: str) -> str:
+        return self.__char_set.get(code)
 
 
-
-class Visualisation:
+class Visualisation(Char_set):
     __c_w: float
     __c_h: float
     __m_h: float
     __m_w: float
 
     def __init__(self, c_h: float, c_w: float, maze: MazeGrid, maze_structure: dict[tuple[float, ...]: int]):
+        super().__init__()
         self.__c_h = c_h
         self.__c_w = c_w
         self.__m_h = maze.height
@@ -119,25 +112,25 @@ class Visualisation:
         room_bit: int = self.__struct.get(adjoining_rooms)
         adjacent_cell_bit: int = self.__struct.get(adjacent_cell)
 
-        print(f"room: {adjoining_rooms,room_bit}, adjacent cell: {adjacent_cell, format(adjacent_cell_bit, 'b')}")
-
-        if room_bit == None:
+        print(f"room: {adjoining_rooms,room_bit}, adjacent cell: {adjacent_cell, adjacent_cell_bit} position: {direction}")
+        if room_bit == None and adjacent_cell_bit == None:
              return ""
-        if adjacent_cell_bit == None:
-             return ""
+        if room_bit == None or adjacent_cell_bit == None:
+             return direction
         if direction == "W":
-                if (room_bit | (1 << 3)) & (adjacent_cell_bit |  (1 << 3)):
+                if (room_bit | (1 << 2)) == (adjacent_cell_bit |  (1 << 0)) == 0: # south <-> nord give W vertice
                     return "W"
         if direction == "S":
-                if (room_bit | (1 << 2)) & (adjacent_cell_bit |  (1 << 2)):
+                if room_bit | (1 << 1) == adjacent_cell_bit |  (1 << 3) == 0:    #east <-> west comparaison give S vertice
                     return "S"
         if direction == "E":
-                if (room_bit | (1 << 1)) & (adjacent_cell_bit |  (1 << 1)):
+                if (room_bit | (1 << 0)) & (adjacent_cell_bit |  (1 << 2)):  #nord <-> south comparaison give E vertice
                     return "E"
         if direction == "N":
-                if (room_bit | (1 << 0)) & (adjacent_cell_bit |  (1 << 0)):
+                if (room_bit | (1 << 1)) & (adjacent_cell_bit |  (1 << 3)): #east <-> west comparaison gieve the N
                     return "N"
         return ""
+    
     
     def get_vertice_structure(self, vertice: tuple[int, ...], adjoining_rooms: List[tuple[int, ...]])  -> str:
         
@@ -147,29 +140,30 @@ class Visualisation:
         e_cell: tuple[int] = tuple([adjoining_rooms[1][0] , adjoining_rooms[1][1] - 1])
         s_cell: tuple[int] = tuple([adjoining_rooms[1][0] - 1 , adjoining_rooms[1][1]])
 
-
-        
-        if w_cell in self.__struct:
-            west: str = self.check_if_open(adjoining_rooms[0], w_cell, "W")
-            v = v + west
-        if s_cell in self.__struct:
-            south: str = self.check_if_open(adjoining_rooms[1], s_cell, "S")
-            v = v + south
-        if e_cell in self.__struct:
-            east: str = self.check_if_open(adjoining_rooms[1], e_cell, "E")
-            v = v + east
-        if n_cell in self.__struct:
-            nord: str = self.check_if_open(adjoining_rooms[0], n_cell, "N")
-            v = v + nord
         print(f"adjoining root: {adjoining_rooms}")
         print(f"vertice: {vertice}, w: {w_cell}, n: {n_cell}, e: {e_cell}, s: {s_cell}")
-        print(f"structure: {v}")
-        return v
+        
+        
+        nord: str = self.check_if_open(adjoining_rooms[0], n_cell, "N")
+        v = v + nord
+        east: str = self.check_if_open(adjoining_rooms[1], e_cell, "E")
+        v = v + east
+        south: str = self.check_if_open(adjoining_rooms[1], s_cell, "S")
+        v = v + south
+        west: str = self.check_if_open(adjoining_rooms[0], w_cell, "W")
+        v = v + west
+
+        print(v)
+        return self.get_char(v)
 
     def display_maze(self) -> None:
         vertices: dict[tuple[int]: list[tuple[int, ...]]] = self.vertice_dict()
         for vertice in vertices:
-            print(self.get_vertice_structure(vertice, vertices.get(vertice)))
+            charactere: str = self.get_vertice_structure(vertice, vertices.get(vertice))
+            #rint(charactere,end="")
+            # if vertice[0] != self.__c_w:
+            #     for size in range(self.__c_w):
+            #         print(self.get_char("EW"), end="")
 
 
 def get_bits(cell: tuple[float, ...], open_neighbors: List[Cell]) -> int :
@@ -225,6 +219,7 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 
 
 def visualisation_maze(maze: MazeGrid) -> None:
-    
+    #print((9 | (1 << 1) == 11 | (1 << 3)))
     visualiser: Visualisation = Visualisation(4,4, maze, get_output(maze))
     visualiser.display_maze()
+    print(maze.graph)
