@@ -85,12 +85,13 @@ class Char:
     W:typing.Literal[True] = '╴'
     EMPTY:typing.Literal[True] = '.'
 
+
+
 class Visualisation:
     __c_w: float
     __c_h: float
     __m_h: float
     __m_w: float
-
 
     def __init__(self, c_h: float, c_w: float, maze: MazeGrid, maze_structure: dict[tuple[float, ...]: int]):
         self.__c_h = c_h
@@ -99,94 +100,57 @@ class Visualisation:
         self.__m_w = maze.width
         self.__struct  = maze_structure
 
-
-    @staticmethod
-    def get_the_bit(value: int, direction: int) -> int:
-        match direction:
-            case "N":
-                return (value >> 3) & 1
-            case "E":
-                return (value >> 2) & 1
-            case "S":
-                return (value >> 1) & 1
-            case "W":
-                return (value >> 0) & 1
-            
-    def get_fist_line(self, cell: tuple[str], wall: int) -> str  :
-        line : str = ""
-        if cell[0] == 0 and cell[1] == 0:
-            line = line + Char.LT
-            for x in range(self.__c_w):
-                    line = line + Char.H
-        elif cell[0] == self.__m_w - 1 and cell[1] == 0:
-            if self.get_the_bit(wall, "W") == 0:
-                line = line + Char.JT
-            for x in range(self.__c_w):
-                line = line + Char.H
-            line = line +  Char.RT
-        elif cell[1] == 0:
-            if self.get_the_bit(wall, "W") == 0:
-                line = line + Char.JT
-            for x in range(self.__c_w):
-                    line = line + Char.H
-        print(line, flush=True, end="")
-
-    def get_middle_line(self, cell: tuple[str], wall: int):
-        line : str = ""
-        if cell[0] == 0:
-            line = line + Char.V
-            for x in range(self.__c_w):
-                    line = line + " "
-        else:
-            if self.get_the_bit(wall, "W") == 0:
-                line = line + Char.V
-            for x in range(self.__c_w):
-                    line = line + " "
-            if cell[0] == self.__m_w - 1 :
-                    line = line + Char.V
-        print(line, flush=True, end="")
+    def vertice_dict(self) -> dict[tuple[int]: list[tuple[int, ...]]]:
+        """ 
+            create a dict of vertice (jonction point of the cell ) and match the vertice point whith 2 oposed adjoining rooms (Nord-west/ Sud-east) see the read me.
+            The number of vertice = maze_width + 1 * maze_height + 1
+        
+        """
+        vertice: dict[tuple[int, ...]: list[tuple[int, ...]]] = {}
+        for x in range(self.__m_h + 1):
+            for y in range(self.__m_w + 1):
+                cell: tuple[int, ...] = (y, x)
+                nw: tuple[int, ...] = (y - 1 , x -1)
+                se: tuple[int, ...] = (y , x)
+                vertice.update({cell:list[nw, se]})
+        return vertice
     
-    def get_top_line(self, cell: tuple[str], wall: int) -> str:
-        line : str = ""
-        if cell[0] == 0:
-            if self.get_the_bit(wall, "N") == 0:
-                line = line + Char.JL
-                for x in range(self.__c_w):
-                    line = line + Char.V
-            else:
-                line = line + Char.V
-                for x in range(self.__c_w):
-                    line = line + " "
-                 
+    def get_vertice_structure (vertice: tuple[int], adjoining_rooms: list[tuple[int, ...]]):
+
+    def display_maze(self) -> None:
+        vertices: dict[tuple[int]: list[tuple[int, ...]]] = self.vertice_dict()
+        for x in vertices:
+            print(x, vertices.get(x))
+        
 
 
 def get_bits(cell: tuple[float, ...], open_neighbors: list[Cell]) -> int :
 
 
-    nord: tuple[float, ...] = (cell[0] , cell[1] - 1) 
-    est: tuple[float, ...] = (cell[0] + 1 , cell[1]) 
-    sud: tuple[float, ...] = (cell[0] , cell[1] + 1)
     west: tuple[float, ...] = (cell[0] - 1 , cell[1])
+    sud: tuple[float, ...] = (cell[0] , cell[1] + 1)
+    est: tuple[float, ...] = (cell[0] + 1 , cell[1]) 
+    nord: tuple[float, ...] = (cell[0] , cell[1] - 1) 
 
     # the binary value of 0 is 0000
     value: int = 0
 
     #this mask active the first bit for the West wall
-    # if the West variable tuple is on neighbour list this bit is activate
-    if west in open_neighbors:
-        value = value | (1 << 0)
-    #this mask active the second bit for the South wall
-    # if the South variable tuple is on neighbour list this bit is activate
-    if sud in open_neighbors:
-        value = value | (1 << 1)
-    #this mask active the third bit for the Est wall
-    # if the Est variable tuple is on neighbour list this bit is activate
-    if est in open_neighbors:
-        value = value | (1 << 2)
-    #this mask active the fourth bit for the Nord wall
-    # if the Nord variable tuple is on neighbour list this bit is activate
-    if nord in open_neighbors:
+    # if the West variable tuple is not on open neighbour list this bit is activate the wall is closed an value
+    if west not in open_neighbors:
         value = value | (1 << 3)
+    #this mask active the second bit for the South wall
+    # if the South variable tuple is not on open neighbour list this bit is activate the wall is closed
+    if sud not in open_neighbors:
+        value = value | (1 << 2)
+    #this mask active the third bit for the Est wall
+    # if the Est variable tuple is on open neighbour list this bit is activate the wall is closed
+    if est not in open_neighbors:
+        value = value | (1 << 1)
+    #this mask active the fourth bit for the Nord wall
+    # if the Nord variable tuple is on open neighbour list this bit is activate the wall is closed
+    if nord not in open_neighbors:
+        value = value | (1 << 0)
 
     return value
      
@@ -196,9 +160,10 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
     """ 
     return a dict with cell coordonee as key and 
     integer value who represente which wall is open 
-    exemple 0100 -> only east wall is open
+    exemple: WSEN -> 0100 -> West is open, south is closed, east is open and nord is open
+    exemple: WSEN -> 0000 -> all the wall are open 
+    exemple: WSEN -> 1111 -> all the wall are closed 
     """
-
     graph: defaultdict[Cell, list[Cell]] = maze.graph
     output: dict[tuple[float, ...]: int] = {}
     for cell in graph:
@@ -209,22 +174,9 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
     
     return output
 
-def vertice_dict(width: int, heigh: int) -> dict[tuple[int]: list[tuple[int, ...]]]:
 
-    vertice: dict[tuple[int, ...]: list[tuple[int, ...]]] = {}
-    for x in range(heigh + 1):
-         for y in range(width + 1):
-              cell: tuple[int, ...] = (y, x)
-              ne: tuple[int, ...] = (y, x - 1)
-              se: tuple[int, ...] = (y , x)
-              sw: tuple[int, ...] = (y -1 , x)
-              nw: tuple[int, ...] = (y - 1 , x -1)
-              vertice.update({cell:list[ne,se, sw, nw]})
-    return vertice
 
 def visualisation_maze(maze: MazeGrid) -> None:
     
-
-    sommet = vertice_dict(maze.width, maze.height)
-    for s in sommet:
-        print(s, sommet.get(s))
+    visualiser: Visualisation = Visualisation(4,4, maze, get_output(maze))
+    visualiser.display_maze()
