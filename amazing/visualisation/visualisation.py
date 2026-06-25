@@ -118,16 +118,16 @@ class Visualisation(Char_set):
         if room_bit == None or adjacent_cell_bit == None:
              return direction
         if direction == "W":
-                if (room_bit | (1 << 2)) == (adjacent_cell_bit |  (1 << 0)) == 0: # south <-> nord give W vertice
+                if ((room_bit | (1 << 2)) == (adjacent_cell_bit |  (1 << 0))) == 1: # south <-> nord give W vertice
                     return "W"
         if direction == "S":
-                if room_bit | (1 << 1) == adjacent_cell_bit |  (1 << 3) == 0:    #east <-> west comparaison give S vertice
+                if ((room_bit | (1 << 1)) == (adjacent_cell_bit |  (1 << 3))) == 1:    #east <-> west comparaison give S vertice
                     return "S"
         if direction == "E":
-                if (room_bit | (1 << 0)) & (adjacent_cell_bit |  (1 << 2)):  #nord <-> south comparaison give E vertice
+                if ((room_bit | (1 << 0)) == (adjacent_cell_bit |  (1 << 2))) == 1:  #nord <-> south comparaison give E vertice
                     return "E"
         if direction == "N":
-                if (room_bit | (1 << 1)) & (adjacent_cell_bit |  (1 << 3)): #east <-> west comparaison gieve the N
+                if ((room_bit | (1 << 1)) == (adjacent_cell_bit |  (1 << 3))) == 1: #east <-> west comparaison gieve the N
                     return "N"
         return ""
     
@@ -219,7 +219,8 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 
 
 def visualisation_maze(maze: MazeGrid) -> None:
-    #print((9 | (1 << 1) == 11 | (1 << 3)))
+    print((9 | (1 << 2) )== (10 | (1 << 0)) == 1)
     visualiser: Visualisation = Visualisation(4,4, maze, get_output(maze))
     visualiser.display_maze()
-    print(maze.graph)
+    for x in maze.graph:
+        print(f"{x}, {maze.graph[x]}")
