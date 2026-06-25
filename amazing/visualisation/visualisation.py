@@ -119,7 +119,7 @@ class Visualisation:
         room_bit: int = self.__struct.get(adjoining_rooms)
         adjacent_cell_bit: int = self.__struct.get(adjacent_cell)
 
-        #print(f"room: {adjoining_rooms,room_bit}, adjacent cell: {adjacent_cell,adjacent_cell_bit}")
+        print(f"room: {adjoining_rooms,room_bit}, adjacent cell: {adjacent_cell, format(adjacent_cell_bit, 'b')}")
 
         if room_bit == None:
              return ""
@@ -148,8 +148,7 @@ class Visualisation:
         s_cell: tuple[int] = tuple([adjoining_rooms[1][0] - 1 , adjoining_rooms[1][1]])
 
 
-        #print(f"adjoining root: {adjoining_rooms}")
-        #print(f"vertice: {vertice}, w: {w_cell}, n: {n_cell}, e: {e_cell}, s: {s_cell}")
+        
         if w_cell in self.__struct:
             west: str = self.check_if_open(adjoining_rooms[0], w_cell, "W")
             v = v + west
@@ -162,6 +161,9 @@ class Visualisation:
         if n_cell in self.__struct:
             nord: str = self.check_if_open(adjoining_rooms[0], n_cell, "N")
             v = v + nord
+        print(f"adjoining root: {adjoining_rooms}")
+        print(f"vertice: {vertice}, w: {w_cell}, n: {n_cell}, e: {e_cell}, s: {s_cell}")
+        print(f"structure: {v}")
         return v
 
     def display_maze(self) -> None:
