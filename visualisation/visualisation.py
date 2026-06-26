@@ -230,7 +230,7 @@ class Visualisation(Char_set):
                 elif v in self.__forty_two:
                     line = line + self.add_char(" ", self.__c_w - 2, self.__forty_two_color)
                 else:
-                    line = line + self.add_char(" ", self.__c_w - 2, Color_bg.WHITE)
+                    line = line + self.add_char(" ", self.__c_w - 2, Color_bg.TRANSPARANT)
         print(line)
 
     def display_maze(self) -> None:
