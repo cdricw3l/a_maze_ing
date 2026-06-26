@@ -105,13 +105,11 @@ def maze_menu(config_file: str) -> int:
         return 0
 
 if __name__ == "__main__":
-    # arg: list[str] = sys.argv[1:]
-    # if len(arg) != 1:
-    #     Color_line.RED("Configuration path is missing")
-    # else:
-    #     maze_menu(arg[0])
-    #     print("End of the programme")
+    arg: list[str] = sys.argv[1:]
+    if len(arg) != 1:
+        Color_line.RED("Configuration path is missing")
+    else:
+        maze_menu(arg[0])
+        print("End of the programme")
 
-    for i in range(90,100):
-        color = f" i: {i}\033[{i}m hello \033[0m" 
-        print(color)
+    
