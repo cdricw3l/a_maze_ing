@@ -97,8 +97,18 @@ class Visualisation(Char_set):
     __entry: tuple[int, int]
     __exit: tuple[int, int]
     __struct: dict[tuple[float, ...]: int]
+    __color: str
+    __reset: str
 
-    def __init__(self, c_h: float, c_w: float, maze: MazeGrid, maze_structure: dict[tuple[float, ...]: int], forty_two: Set[Cell]):
+    def __init__(
+            self,
+            c_h: float,
+            c_w: float,
+            maze: MazeGrid,
+            maze_structure: dict[tuple[float, ...]: int],
+            forty_two: Set[Cell],
+            color: str
+        ):
         super().__init__()
         self.__c_h = c_h
         self.__c_w = c_w
@@ -108,7 +118,9 @@ class Visualisation(Char_set):
         self.__exit = maze.exit
         self.__forty_two = forty_two
         self.__struct  = maze_structure
-
+        self.__color = color
+        self.__reset = "\033[0m"
+    
     def vertice_dict(self) -> dict[tuple[int]: list[tuple[int, ...]]]:
         """ 
             create a dict of vertice (jonction point of the cell ) and match the vertice point whith 2 oposed adjoining rooms (Nord-west/ Sud-east) see the read me.
@@ -153,7 +165,7 @@ class Visualisation(Char_set):
         return ""
     
     
-    def get_vertice_char(self, vertice: tuple[int, ...], adjoining_rooms: List[tuple[int, ...]])  -> str:
+    def get_vertice_char(self, adjoining_rooms: List[tuple[int, ...]])  -> str:
         
         v: str = ""
         w_cell: tuple[int] = tuple([adjoining_rooms[0][0], adjoining_rooms[0][1] + 1])
@@ -177,9 +189,10 @@ class Visualisation(Char_set):
 
 
     def add_char(self, char: str, number: int) -> str:
-        line : str = ""
+        line : str = f"{self.__color}"
         for i in range(number):
             line = line + char
+        line = line + f"{self.__reset}"
         return line
 
     def is_on_vertical_set(self, char: str) -> bool:
@@ -223,7 +236,7 @@ class Visualisation(Char_set):
     def create_h_line(self, vertices: dict[tuple[int, ...], str]) -> None:
         line: str = ""
         for v in vertices:
-            line = line + vertices.get(v)
+            line = line + f"{self.__color}{vertices.get(v)}{self.__reset}"
             if v[0] != self.__m_w:
                 if self.is_on_horizontal_set(vertices.get(v)):
                     line = line + self.add_char(Char_set.get_char(self, "EW"), self.__c_w - 2)
@@ -235,7 +248,7 @@ class Visualisation(Char_set):
         line: str = ""
         for v in vertices:
             if self.is_on_vertical_set(vertices.get(v)):
-                line = line + Char_set.get_char(self, "NS")
+                line = line + f"{self.__color}{Char_set.get_char(self, "NS")}{self.__reset}"
             else:
                 line = line + " "
             if v[0] != self.__m_w:
@@ -254,10 +267,9 @@ class Visualisation(Char_set):
         vertices_and_char: dict[tuple[int, ...], str] = {}
         for vertice in vertices_and_adjacent:
             #print(f"{vertice}, ajoining :{vertices.get(vertice)}")
-            charactere: str = self.get_vertice_char(vertice, vertices_and_adjacent.get(vertice))
+            charactere: str = self.get_vertice_char(vertices_and_adjacent.get(vertice))
             vertices_and_char.update({vertice:charactere})
         
-        #for i in range(self.__m_h + 1):
         for i in range(self.__m_h + 1):
             new_v: dict[tuple[int, ...], str] = {k:vertices_and_char[k] for k in vertices_and_char if k[1] == i}
             self.create_h_line(new_v)

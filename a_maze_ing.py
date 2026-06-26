@@ -31,8 +31,7 @@ def color_choice() -> str:
 
 def maze_menu(config_file: str) -> int:
     maze : MazeGrid = get_maze(config_file)
-    visualisation_maze(maze)
-
+    visualisation_maze(maze, "\033[0m")
     try:
         while True:
             print("=== A-Maze-ing ===")
@@ -44,10 +43,14 @@ def maze_menu(config_file: str) -> int:
             match user_input:
                 case "1":
                     maze : MazeGrid = get_maze(config_file)
-                    visualisation_maze(maze, None)
+                    visualisation_maze(maze, "\033[0m")
                 case "2":
                     maze : MazeGrid = get_maze(config_file)
-                    visualisation_maze(maze, None)
+                    visualisation_maze(maze, "\033[0m")
+                case "3":
+                    maze : MazeGrid = get_maze(config_file)
+                    color: str = color_choice()
+                    visualisation_maze(maze, color)
                 case "4":
                     return 0
                 case _:
