@@ -1,34 +1,30 @@
-from amazing.maze_generator.maze import MazeGrid, Cell
+from maze_generator.maze import MazeGrid, Cell
 from collections import defaultdict
-from typing import DefaultDict, Iterable, List, Tuple, Set, Optional, Literal
-
-def prRed(s): print("\033[91m {}\033[00m".format(s))
-def prGreen(s): print("\033[92m {}\033[00m".format(s), end= " ")
-def prYellow(s): print("\033[93m {}\033[00m".format(s))
-def prLightPurple(s): print("\033[94m {}\033[00m".format(s))
-def prPurple(s): print("\033[95m {}\033[00m".format(s))
-def prCyan(s): print("\033[96m {}\033[00m".format(s))
-def prLightGray(s): print("\033[97m {}\033[00m".format(s))
-def prBlack(s): print("\033[90m {}\033[00m".format(s))
+from typing import List, Set
 
 
 class Char_set:
-   
-    __char_set: dict[str,str]
+
+    __char_set: dict[str, str]
+
     def __init__(self):
-        self.__char_set: dict[str,str] = {
-            "NESW" : "╋", "NES" :'┣', "NEW" :'┻', "NSW": '┫', "ESW": '┳', "NE": '┗',
-            "NS": '┃', "NW": '┛', "ES": '┏', "EW": '━', "SW": '┓', "N": '╹', "E":'╺',
-            "S": '╻',"W":'╸', "EMPTY": '.'}
+        self.__char_set: dict[str, str] = {
+            "NESW": "╋", "NES": '┣', "NEW": '┻',
+            "NSW": '┫', "ESW": '┳', "NE": '┗',
+            "NS": '┃', "NW": '┛', "ES": '┏',
+            "EW": '━', "SW": '┓', "N": '╹',
+            "E": '╺', "S": '╻', "W": '╸'}
 
     def get_char(self, code: str) -> str:
         return self.__char_set.get(code)
+
 
 class Direction:
     WEST: int = 3
     SOUTH: int = 2
     EAST: int = 1
     NORD: int = 0
+
 
 class Visualisation(Char_set):
     __c_w: float
@@ -49,9 +45,9 @@ class Visualisation(Char_set):
             maze: MazeGrid,
             maze_structure: dict[tuple[float, ...]: int],
             forty_two: Set[Cell],
-            color: str ="\033[0m",
-            forty_two_color: str ="\033[45m"
-        ):
+            color: str = "\033[0m",
+            forty_two_color: str = "\033[45m"
+            ) -> None:
         super().__init__()
         self.__c_h = c_h
         self.__c_w = c_w
@@ -60,22 +56,23 @@ class Visualisation(Char_set):
         self.__entry = maze.entry
         self.__exit = maze.exit
         self.__forty_two = forty_two
-        self.__struct  = maze_structure
+        self.__struct = maze_structure
         self.__color = color
         self.__forty_two_color = forty_two_color
         self.__reset = "\033[0m"
-    
+
     def vertice_dict(self) -> dict[tuple[int]: list[tuple[int, ...]]]:
-        """ 
-            create a dict of vertice (jonction point of the cell ) and match the vertice point whith 2 oposed adjoining rooms (Nord-west/ Sud-east) see the read me.
+        """
+            create a dict of vertice (jonction point of the cell )
+            and match the vertice point whith 2 oposed adjoining rooms
+            (Nord-west/ Sud-east) see the read me.
             The number of vertice = maze_width + 1 * maze_height + 1
-        
         """
         vertice: dict[tuple[int, ...]: list[tuple[int, ...]]] = {}
         for x in range(self.__m_h + 1):
             for y in range(self.__m_w + 1):
-                cell: tuple[int, ...] = (y, x)
-                nw: tuple[int, ...] = (y - 1 , x -1)
+                cell: tuple[int, int] = (y, x)
+                nw: tuple[int, int] = (y - 1 , x -1)
                 se: tuple[int, ...] = (y , x)
                 vertice.update({cell:list([nw, se])})
         return vertice
@@ -119,7 +116,6 @@ class Visualisation(Char_set):
 
         # print(f"adjoining root: {adjoining_rooms}")
         # print(f"vertice: {vertice}, w: {w_cell}, n: {n_cell}, e: {e_cell}, s: {s_cell}")
-        
         
         nord: str = self.check_if_open(adjoining_rooms[0], n_cell, "N")
         v = v + nord
@@ -221,8 +217,15 @@ class Visualisation(Char_set):
             for j in range(3):
                 self.create_v_line(new_v)
 
-def bytes_direction_activation(cell: tuple[float, ...], open_neighbors: List[Cell]) -> int :
+    def set_bg_color(self, color: str) -> None:
+        self.__forty_two_color = color
 
+    def set_line_color(self, color: str) -> None:
+        self.__color = color
+
+
+
+def bytes_direction_activation(cell: tuple[float, ...], open_neighbors: List[Cell]) -> int :
 
     west: tuple[float, ...] = (cell[0] - 1 , cell[1])
     sud: tuple[float, ...] = (cell[0] , cell[1] + 1)

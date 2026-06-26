@@ -1,5 +1,3 @@
-from enum import Enum
-
 class Color_bg():
     TRANSPARANT: str = "\033[48m"
     BLACK: str = "\033[40m"
@@ -12,6 +10,7 @@ class Color_bg():
     WHITE: str = "\033[47m"
     DEFAULT: str = "\033[47m"
     RESET: str = "\033[0m"
+
 
 class Color_line():
     BLACK: str = "\033[90m"
