@@ -165,34 +165,71 @@ class Visualisation(Char_set):
         return self.get_char(v)
 
 
-    def add_char(self, char: str, number: int) -> None:
-         for i in range(number):
-            print(char, end="")
+    def add_char(self, char: str, number: int) -> str:
+        line : str = ""
+        for i in range(number):
+            line = line + char
+        return line
+
+    def is_on_vertical_set(self, char: str) -> bool:
+        if self.get_char("NESW") == char:
+            return True
+        elif self.get_char("NES") == char:
+            return True
+        elif self.get_char("NSW") == char:
+            return True
+        elif self.get_char("ESW") == char:
+            return True
+        elif self.get_char("NS") == char:
+            return True
+        elif self.get_char("ES") == char:
+            return True
+        elif self.get_char("SW") == char:
+            return True
+        elif self.get_char("S") == char:
+            return True
+        return False
     
-    def is_on_intervertice_set(self, char: str) -> bool:
-        if self.get_char("NEW") == char:
-            return False
+    def is_on_horizontal_set(self, char:str) -> bool:
+        if self.get_char("NESW") == char:
+            return True
+        elif self.get_char("NES") == char:
+            return True
+        elif self.get_char("NEW") == char:
+            return True
+        elif self.get_char("ESW") == char:
+            return True
         elif self.get_char("NE") == char:
-            return False
-        elif self.get_char("NW") == char:
-            return False
+            return True
+        elif self.get_char("ES") == char:
+            return True
         elif self.get_char("EW") == char:
-            return False
-        elif self.get_char("N") == char:
-            return False
+            return True
         elif self.get_char("E") == char:
-            return False
-        elif self.get_char("W") == char:
-            return False
-        return True
-    
-    def add_inter_vertice(self, vertice: dict[tuple[int, ...], str]) -> None:
-        for i in range(self.__c_h):
-            for v in vertice:
-                if self.is_on_intervertice_set(vertice.get(v)) :
-                    print(self.get_char("NS"), end="")
-                self.add_char(" ", self.__c_w)
-            print()
+            return True
+        return False
+
+    def create_h_line(self, vertices: dict[tuple[int, ...], str]) -> None:
+        line: str = ""
+        for v in vertices:
+            line = line + vertices.get(v)
+            if v[0] != self.__m_w:
+                if self.is_on_horizontal_set(vertices.get(v)):
+                    line = line + self.add_char("─", self.__c_w - 2)
+                else:
+                    line = line + self.add_char(" ", self.__c_w - 2)
+        print(line)
+
+    def create_v_line(self, vertices: dict[tuple[int, ...], str]) -> None:
+        line: str = ""
+        for v in vertices:
+            if self.is_on_vertical_set(vertices.get(v)):
+                line = line + "│"
+            else:
+                line = line + " "
+            if v[0] != self.__m_w:
+                line = line + self.add_char(" ", self.__c_w - 2)
+        print(line)
 
     def display_maze(self) -> None:
         vertices_and_adjacent: dict[tuple[int, ...]: list[tuple[int, ...]]] = self.vertice_dict()
@@ -203,15 +240,12 @@ class Visualisation(Char_set):
             vertices_and_char.update({vertice:charactere})
         
         #for i in range(self.__m_h + 1):
-        for i in range(1):
+        for i in range(self.__m_h + 1):
             new_v: dict[tuple[int, ...], str] = {k:vertices_and_char[k] for k in vertices_and_char if k[1] == i}
-            for v in new_v:
-                print(new_v.get(v), end="")
-                if v[0] != self.__m_h:
-                    self.add_char(self.get_char("EW"),self.__c_w)
-            print()
-            self.add_inter_vertice(new_v)
-
+            self.create_h_line(new_v)
+            self.create_v_line(new_v)
+            self.create_v_line(new_v)
+            self.create_v_line(new_v)
 
 def bytes_direction_activation(cell: tuple[float, ...], open_neighbors: List[Cell]) -> int :
 
