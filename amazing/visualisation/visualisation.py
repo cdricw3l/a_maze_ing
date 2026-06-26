@@ -317,7 +317,6 @@ def visualisation_maze(maze: MazeGrid) -> None:
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
     output: dict[tuple[float,...]: int] = get_output(maze)
     visualiser: Visualisation = Visualisation(10, 10, maze, output, forty_two)
-    print(forty_two)
     visualiser.display_maze()
     
    

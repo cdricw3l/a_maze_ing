@@ -111,7 +111,6 @@ class MazeGrid:
             return forbidden
         x: int = int(width / 2)
         y: int = int(height / 2)
-        print(f"x: {x}, y: {y}")
         forbidden = {
             (x+1, y),
             (x+2, y),
