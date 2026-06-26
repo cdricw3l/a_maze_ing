@@ -38,8 +38,9 @@ def maze_menu(config_file: str) -> int:
             print("1. Re-generate a new maze")
             print("2. Show/hide path from entry to exit")
             print("3. Rotate maze colors")
-            print("4. Quit")
-            user_input = input("Choice? (1-4): ")
+            print("4. Rotate maze colors")
+            print("5. Quit")
+            user_input = input("Choice? (1-5): ")
             match user_input:
                 case "1":
                     maze : MazeGrid = get_maze(config_file)
@@ -52,9 +53,13 @@ def maze_menu(config_file: str) -> int:
                     color: str = color_choice()
                     visualisation_maze(maze, color)
                 case "4":
+                    forty_two_color: str = color_choice()
+                    visualisation_maze(maze, color, forty_two_color)
+                    return 0
+                case "5":
                     return 0
                 case _:
-                    print("Choose a valide input between 1-3 or quit with 4")
+                    print("Choose a valide input between 1-4 or quit with 5")
                     continue
     except (Exception, KeyboardInterrupt):
         return 0
