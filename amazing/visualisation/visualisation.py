@@ -89,6 +89,8 @@ class Visualisation(Char_set):
     __c_h: float
     __m_h: float
     __m_w: float
+    __entry: tuple[int, int]
+    __exit: tuple[int, int]
 
     def __init__(self, c_h: float, c_w: float, maze: MazeGrid, maze_structure: dict[tuple[float, ...]: int]):
         super().__init__()
@@ -96,6 +98,8 @@ class Visualisation(Char_set):
         self.__c_w = c_w
         self.__m_h = maze.height
         self.__m_w = maze.width
+        self.__entry = maze.entry
+        self.__exit = maze.exit
         self.__struct  = maze_structure
 
     def vertice_dict(self) -> dict[tuple[int]: list[tuple[int, ...]]]:
@@ -215,6 +219,7 @@ class Visualisation(Char_set):
             line = line + vertices.get(v)
             if v[0] != self.__m_w:
                 if self.is_on_horizontal_set(vertices.get(v)):
+                    assert(self.__c_w == 10)
                     line = line + self.add_char("─", self.__c_w - 2)
                 else:
                     line = line + self.add_char(" ", self.__c_w - 2)
@@ -228,7 +233,12 @@ class Visualisation(Char_set):
             else:
                 line = line + " "
             if v[0] != self.__m_w:
-                line = line + self.add_char(" ", self.__c_w - 2)
+                if v == self.__entry:
+                    line = line + self.add_char("\033[42m \033[00m", self.__c_w - 2)
+                elif v == self.__exit:
+                    line = line + self.add_char("\033[41m \033[00m", self.__c_w - 2)
+                else:
+                    line = line + self.add_char(" ", self.__c_w - 2)
         print(line)
 
     def display_maze(self) -> None:
@@ -243,9 +253,9 @@ class Visualisation(Char_set):
         for i in range(self.__m_h + 1):
             new_v: dict[tuple[int, ...], str] = {k:vertices_and_char[k] for k in vertices_and_char if k[1] == i}
             self.create_h_line(new_v)
-            self.create_v_line(new_v)
-            self.create_v_line(new_v)
-            self.create_v_line(new_v)
+            assert(self.__c_h == 10)
+            for j in range(3):
+                self.create_v_line(new_v)
 
 def bytes_direction_activation(cell: tuple[float, ...], open_neighbors: List[Cell]) -> int :
 
@@ -304,8 +314,4 @@ def visualisation_maze(maze: MazeGrid) -> None:
     visualiser: Visualisation = Visualisation(10, 10, maze, get_output(maze))
     visualiser.display_maze()
     
-    # output: dict[tuple[int, ...], int] = get_output(maze)
-    # # for o in output:
-    # #      print(f"cell: {o}, wall: {output.get(o)}, bit_wall: {format(output.get(o), 'b')}")
-    # for x in maze.graph:
-    #     print(f"{x}, {maze.graph[x]}")
+   
