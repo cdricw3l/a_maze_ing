@@ -109,8 +109,9 @@ class MazeGrid:
         forbidden: set[Cell] = set()
         if width < 7 and height < 7:
             return forbidden
-        x: int = width / 2
-        y: int = height / 2
+        x: int = int(width / 2)
+        y: int = int(height / 2)
+        print(f"x: {x}, y: {y}")
         forbidden = {
             (x+1, y),
             (x+2, y),
@@ -118,14 +119,14 @@ class MazeGrid:
             (x-2, y),
             (x+1, y+2),
             (x+1, y-2),
-            (x+1, y-1),
+            (x+2, y-1),
             (x+2, y+2),
-            (x+2, y+1),
+            (x+1, y+1),
             (x+2, y-2),
-            (x-2, y+2),
-            (x-2, y+1), 
-            (x-1, y-1),
-            (x-1, y-2)
+            (x-1, y+2),
+            (x-1, y+1), 
+            (x-2, y-1),
+            (x-2, y-2)
         }
         return forbidden
 
