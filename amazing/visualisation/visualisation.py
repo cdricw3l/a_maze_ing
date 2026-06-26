@@ -117,7 +117,7 @@ class Visualisation(Char_set):
         room_bit: int = self.__struct.get(adjoining_rooms)
         adjacent_cell_bit: int = self.__struct.get(adjacent_cell)
 
-        print(f"room: {adjoining_rooms,room_bit}, adjacent cell: {adjacent_cell, adjacent_cell_bit} position: {direction}")
+        #print(f"room: {adjoining_rooms,room_bit}, adjacent cell: {adjacent_cell, adjacent_cell_bit} position: {direction}")
 
         if room_bit == None and adjacent_cell_bit == None:
              return ""
@@ -142,7 +142,7 @@ class Visualisation(Char_set):
         return ""
     
     
-    def get_vertice_structure(self, vertice: tuple[int, ...], adjoining_rooms: List[tuple[int, ...]])  -> str:
+    def get_vertice_char(self, vertice: tuple[int, ...], adjoining_rooms: List[tuple[int, ...]])  -> str:
         
         v: str = ""
         w_cell: tuple[int] = tuple([adjoining_rooms[0][0], adjoining_rooms[0][1] + 1])
@@ -150,8 +150,8 @@ class Visualisation(Char_set):
         e_cell: tuple[int] = tuple([adjoining_rooms[1][0] , adjoining_rooms[1][1] - 1])
         s_cell: tuple[int] = tuple([adjoining_rooms[1][0] - 1 , adjoining_rooms[1][1]])
 
-        print(f"adjoining root: {adjoining_rooms}")
-        print(f"vertice: {vertice}, w: {w_cell}, n: {n_cell}, e: {e_cell}, s: {s_cell}")
+        # print(f"adjoining root: {adjoining_rooms}")
+        # print(f"vertice: {vertice}, w: {w_cell}, n: {n_cell}, e: {e_cell}, s: {s_cell}")
         
         
         nord: str = self.check_if_open(adjoining_rooms[0], n_cell, "N")
@@ -162,22 +162,58 @@ class Visualisation(Char_set):
         v = v + south
         west: str = self.check_if_open(adjoining_rooms[0], w_cell, "W")
         v = v + west
-
-        print(v)
         return self.get_char(v)
 
+
+    def add_char(self, char: str, number: int) -> None:
+         for i in range(number):
+            print(char, end="")
+    
+    def is_on_intervertice_set(self, char: str) -> bool:
+        if self.get_char("NEW") == char:
+            return False
+        elif self.get_char("NE") == char:
+            return False
+        elif self.get_char("NW") == char:
+            return False
+        elif self.get_char("EW") == char:
+            return False
+        elif self.get_char("N") == char:
+            return False
+        elif self.get_char("E") == char:
+            return False
+        elif self.get_char("W") == char:
+            return False
+        return True
+    
+    def add_inter_vertice(self, vertice: dict[tuple[int, ...], str]) -> None:
+        for i in range(self.__c_h):
+            for v in vertice:
+                if self.is_on_intervertice_set(vertice.get(v)) :
+                    print(self.get_char("NS"), end="")
+                self.add_char(" ", self.__c_w)
+            print()
+
     def display_maze(self) -> None:
-        vertices: dict[tuple[int]: list[tuple[int, ...]]] = self.vertice_dict()
-        for vertice in vertices:
-            print(f"{vertice}, ajoining :{vertices.get(vertice)}")
-            charactere: str = self.get_vertice_structure(vertice, vertices.get(vertice))
-            print(charactere, end="\n")
-            # if vertice[0] != self.__c_w:
-            #     for size in range(self.__c_w):
-            #         print(self.get_char("EW"), end="")
+        vertices_and_adjacent: dict[tuple[int, ...]: list[tuple[int, ...]]] = self.vertice_dict()
+        vertices_and_char: dict[tuple[int, ...], str] = {}
+        for vertice in vertices_and_adjacent:
+            #print(f"{vertice}, ajoining :{vertices.get(vertice)}")
+            charactere: str = self.get_vertice_char(vertice, vertices_and_adjacent.get(vertice))
+            vertices_and_char.update({vertice:charactere})
+        
+        #for i in range(self.__m_h + 1):
+        for i in range(1):
+            new_v: dict[tuple[int, ...], str] = {k:vertices_and_char[k] for k in vertices_and_char if k[1] == i}
+            for v in new_v:
+                print(new_v.get(v), end="")
+                if v[0] != self.__m_h:
+                    self.add_char(self.get_char("EW"),self.__c_w)
+            print()
+            self.add_inter_vertice(new_v)
 
 
-def get_bits(cell: tuple[float, ...], open_neighbors: List[Cell]) -> int :
+def bytes_direction_activation(cell: tuple[float, ...], open_neighbors: List[Cell]) -> int :
 
 
     west: tuple[float, ...] = (cell[0] - 1 , cell[1])
@@ -222,7 +258,7 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
     for cell in graph:
         open_neighbors: list[Cell] = graph.get(cell)
         key: tuple[float, ...] = cell
-        value: int = get_bits(key, open_neighbors)
+        value: int = bytes_direction_activation(key, open_neighbors)
         output.update({key:value})
     
     return output
@@ -231,11 +267,11 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 
 def visualisation_maze(maze: MazeGrid) -> None:
   
-    visualiser: Visualisation = Visualisation(4,4, maze, get_output(maze))
+    visualiser: Visualisation = Visualisation(10, 10, maze, get_output(maze))
     visualiser.display_maze()
     
     # output: dict[tuple[int, ...], int] = get_output(maze)
     # # for o in output:
     # #      print(f"cell: {o}, wall: {output.get(o)}, bit_wall: {format(output.get(o), 'b')}")
-    for x in maze.graph:
-        print(f"{x}, {maze.graph[x]}")
+    # for x in maze.graph:
+    #     print(f"{x}, {maze.graph[x]}")
