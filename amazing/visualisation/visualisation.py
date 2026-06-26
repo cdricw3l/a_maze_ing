@@ -49,8 +49,8 @@ class Visualisation(Char_set):
             maze: MazeGrid,
             maze_structure: dict[tuple[float, ...]: int],
             forty_two: Set[Cell],
-            color: str,
-            forty_two_color: str = "\033[93m"
+            color: str ="\033[0m",
+            forty_two_color: str ="\033[45m"
         ):
         super().__init__()
         self.__c_h = c_h
@@ -132,8 +132,8 @@ class Visualisation(Char_set):
         return self.get_char(v)
 
 
-    def add_char(self, char: str, number: int) -> str:
-        line : str = f"{self.__color}"
+    def add_char(self, char: str, number: int, color: str) -> str:
+        line : str = f"{color}"
         for i in range(number):
             line = line + char
         line = line + f"{self.__reset}"
@@ -183,9 +183,9 @@ class Visualisation(Char_set):
             line = line + f"{self.__color}{vertices.get(v)}{self.__reset}"
             if v[0] != self.__m_w:
                 if self.is_on_horizontal_set(vertices.get(v)):
-                    line = line + self.add_char(Char_set.get_char(self, "EW"), self.__c_w - 2)
+                    line = line + self.add_char(Char_set.get_char(self, "EW"), self.__c_w - 2, self.__color)
                 else:
-                    line = line + self.add_char(" ", self.__c_w - 2)
+                    line = line + self.add_char(" ", self.__c_w - 2, self.__color)
         print(line)
 
     def create_v_line(self, vertices: dict[tuple[int, ...], str]) -> None:
@@ -197,13 +197,13 @@ class Visualisation(Char_set):
                 line = line + " "
             if v[0] != self.__m_w:
                 if v == self.__entry:
-                    line = line + self.add_char("\033[42m \033[00m", self.__c_w - 2)
+                    line = line + self.add_char(f"\033[42m \033[00m", self.__c_w - 2, self.__reset)
                 elif v == self.__exit:
-                    line = line + self.add_char("\033[41m \033[00m", self.__c_w - 2)
+                    line = line + self.add_char(f"\033[41m \033[00m", self.__c_w - 2, self.__reset)
                 elif v in self.__forty_two:
-                    line = line + self.add_char("\033[45m \033[00m", self.__c_w - 2)
+                    line = line + self.add_char(" ", self.__c_w - 2, self.__forty_two_color)
                 else:
-                    line = line + self.add_char(" ", self.__c_w - 2)
+                    line = line + self.add_char(" ", self.__c_w - 2, self.__reset)
         print(line)
 
     def display_maze(self) -> None:
@@ -273,7 +273,7 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 
 
 
-def visualisation_maze(maze: MazeGrid, line_color: str, forty_color: str) -> None:
+def visualisation_maze(maze: MazeGrid, line_color, forty_color: str ="\033[45m") -> None:
     
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
     output: dict[tuple[float,...]: int] = get_output(maze)
