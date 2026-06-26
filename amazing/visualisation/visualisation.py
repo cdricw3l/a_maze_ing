@@ -78,6 +78,11 @@ class Char_set:
     def get_char(self, code: str) -> str:
         return self.__char_set.get(code)
 
+class Direction:
+    WEST: int = 3
+    SOUTH: int = 2
+    EAST: int = 1
+    NORD: int = 0
 
 class Visualisation(Char_set):
     __c_w: float
@@ -113,21 +118,26 @@ class Visualisation(Char_set):
         adjacent_cell_bit: int = self.__struct.get(adjacent_cell)
 
         print(f"room: {adjoining_rooms,room_bit}, adjacent cell: {adjacent_cell, adjacent_cell_bit} position: {direction}")
+
         if room_bit == None and adjacent_cell_bit == None:
              return ""
         if room_bit == None or adjacent_cell_bit == None:
              return direction
         if direction == "W":
-                if ((room_bit | (1 << 2)) == (adjacent_cell_bit |  (1 << 0))) == 1: # south <-> nord give W vertice
+                #comparaison nord room_bit -> south ajacent cell give w
+                if ((room_bit | (1 << Direction.SOUTH)) == (adjacent_cell_bit |  (1 << Direction.NORD))) == 1:
                     return "W"
         if direction == "S":
-                if ((room_bit | (1 << 1)) == (adjacent_cell_bit |  (1 << 3))) == 1:    #east <-> west comparaison give S vertice
+                #comparaison WEST room_bit -> EAST ajacent cell give s
+                if ((room_bit | (1 << Direction.WEST)) == (adjacent_cell_bit |  (1 << Direction.EAST))) == 1:
                     return "S"
         if direction == "E":
-                if ((room_bit | (1 << 0)) == (adjacent_cell_bit |  (1 << 2))) == 1:  #nord <-> south comparaison give E vertice
+                #comparaison NORD room_bit -> SOUTH ajacent cell give E
+                if ((room_bit | (1 << Direction.NORD)) == (adjacent_cell_bit |  (1 << Direction.SOUTH))) == 1:
                     return "E"
         if direction == "N":
-                if ((room_bit | (1 << 1)) == (adjacent_cell_bit |  (1 << 3))) == 1: #east <-> west comparaison gieve the N
+                #comparaison EAST room_bit -> WEST ajacent cell give N
+                if ((room_bit | (1 << Direction.EAST)) == (adjacent_cell_bit |  (1 << Direction.WEST))) == 1:
                     return "N"
         return ""
     
@@ -159,8 +169,9 @@ class Visualisation(Char_set):
     def display_maze(self) -> None:
         vertices: dict[tuple[int]: list[tuple[int, ...]]] = self.vertice_dict()
         for vertice in vertices:
+            print(f"{vertice}, ajoining :{vertices.get(vertice)}")
             charactere: str = self.get_vertice_structure(vertice, vertices.get(vertice))
-            #rint(charactere,end="")
+            print(charactere, end="\n")
             # if vertice[0] != self.__c_w:
             #     for size in range(self.__c_w):
             #         print(self.get_char("EW"), end="")
@@ -219,8 +230,17 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 
 
 def visualisation_maze(maze: MazeGrid) -> None:
-    print((9 | (1 << 2) )== (10 | (1 << 0)) == 1)
-    visualiser: Visualisation = Visualisation(4,4, maze, get_output(maze))
-    visualiser.display_maze()
-    for x in maze.graph:
-        print(f"{x}, {maze.graph[x]}")
+    
+    print(format(9, 'b'))
+    print(format(11, 'b'))
+    print((9 >> Direction.WEST & 1 ))
+    
+    print((9 | (1 << Direction.WEST)) == (11 | (1 << Direction.EAST)))
+    # visualiser: Visualisation = Visualisation(4,4, maze, get_output(maze))
+    # visualiser.display_maze()
+    
+    # output: dict[tuple[int, ...], int] = get_output(maze)
+    # for o in output:
+    #      print(f"cell: {o}, wall: {output.get(o)}, bit_wall: {format(output.get(o), 'b')}")
+    # for x in maze.graph:
+    #     print(f"{x}, {maze.graph[x]}")
