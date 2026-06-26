@@ -125,19 +125,19 @@ class Visualisation(Char_set):
              return direction
         if direction == "W":
                 #comparaison nord room_bit -> south ajacent cell give w
-                if ((room_bit | (1 << Direction.SOUTH)) == (adjacent_cell_bit |  (1 << Direction.NORD))) == 1:
+                if (((room_bit >> Direction.SOUTH) & 1 ) == ((adjacent_cell_bit >> Direction.NORD) & 1)) == 1:
                     return "W"
         if direction == "S":
                 #comparaison WEST room_bit -> EAST ajacent cell give s
-                if ((room_bit | (1 << Direction.WEST)) == (adjacent_cell_bit |  (1 << Direction.EAST))) == 1:
+                if (((room_bit >> Direction.WEST) & 1 ) == ((adjacent_cell_bit >> Direction.EAST) & 1)) == 1:
                     return "S"
         if direction == "E":
                 #comparaison NORD room_bit -> SOUTH ajacent cell give E
-                if ((room_bit | (1 << Direction.NORD)) == (adjacent_cell_bit |  (1 << Direction.SOUTH))) == 1:
+                if (((room_bit >> Direction.NORD) & 1 ) == ((adjacent_cell_bit >> Direction.SOUTH) & 1)) == 1:
                     return "E"
         if direction == "N":
                 #comparaison EAST room_bit -> WEST ajacent cell give N
-                if ((room_bit | (1 << Direction.EAST)) == (adjacent_cell_bit |  (1 << Direction.WEST))) == 1:
+                if (((room_bit >> Direction.EAST) & 1 ) == ((adjacent_cell_bit >> Direction.WEST) & 1)) == 1:
                     return "N"
         return ""
     
@@ -231,16 +231,11 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 
 def visualisation_maze(maze: MazeGrid) -> None:
     
-    print(format(9, 'b'))
-    print(format(11, 'b'))
-    print((9 >> Direction.WEST & 1 ))
+    visualiser: Visualisation = Visualisation(4,4, maze, get_output(maze))
+    visualiser.display_maze()
     
-    print((9 | (1 << Direction.WEST)) == (11 | (1 << Direction.EAST)))
-    # visualiser: Visualisation = Visualisation(4,4, maze, get_output(maze))
-    # visualiser.display_maze()
-    
-    # output: dict[tuple[int, ...], int] = get_output(maze)
+    output: dict[tuple[int, ...], int] = get_output(maze)
     # for o in output:
     #      print(f"cell: {o}, wall: {output.get(o)}, bit_wall: {format(output.get(o), 'b')}")
-    # for x in maze.graph:
-    #     print(f"{x}, {maze.graph[x]}")
+    for x in maze.graph:
+        print(f"{x}, {maze.graph[x]}")
