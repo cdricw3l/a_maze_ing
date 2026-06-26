@@ -74,7 +74,7 @@ def forty_two_colors() -> str:
 
 def maze_menu(config_file: str) -> int:
     maze : MazeGrid = get_maze(config_file)
-    visualisation_maze(maze)
+    visualisation_maze(maze, Color_line.DEFAULT, Color_bg.DEFAULT)
     try:
         while True:
             print("=== A-Maze-ing ===")
