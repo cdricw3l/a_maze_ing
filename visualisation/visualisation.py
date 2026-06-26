@@ -1,11 +1,11 @@
 from maze_generator.maze import MazeGrid, Cell
 from .color import Color_bg
 from collections import defaultdict
-from typing import List, Set
+from typing import List, Set, Type
 
-
-Vertice_adjacent = dict[tuple[int, ...]: list[tuple[int, ...]]]
+Vertice_adjacent = dict[tuple[int, int], list[tuple[int, ...]]]
 Vertice_char = dict[tuple[int, int], str]
+Vertice = dict[tuple[int, int], list[tuple[int, int]]]
 
 
 class Char_set:
@@ -20,7 +20,9 @@ class Char_set:
             "EW": '━', "SW": '┓', "N": '╹',
             "E": '╺', "S": '╻', "W": '╸'}
 
-    def get_char(self, code: str) -> str | None:
+    def get_char(self, code: str) -> str:
+        if code is None:
+            return ""
         return self.__char_set.get(code)
 
 
@@ -32,23 +34,23 @@ class Direction:
 
 
 class Visualisation(Char_set):
-    __c_w: float
-    __c_h: float
-    __m_h: float
-    __m_w: float
+    __c_w: int
+    __c_h: int
+    __m_h: int
+    __m_w: int
     __entry: tuple[int, int]
     __exit: tuple[int, int]
-    __struct: dict[tuple[float, ...]: int]
+    __struct: dict[tuple[float, ...], int]
     __color: str
     __forty_two_color: str
     __reset: str
 
     def __init__(
             self,
-            c_h: float,
-            c_w: float,
+            c_h: int,
+            c_w: int,
             maze: MazeGrid,
-            maze_structure: dict[tuple[float, ...]: int],
+            maze_structure: dict[tuple[float, ...], int],
             forty_two: Set[Cell],
             color: str = "\033[0m",
             forty_two_color: str = "\033[45m"
@@ -66,14 +68,14 @@ class Visualisation(Char_set):
         self.__forty_two_color = forty_two_color
         self.__reset = "\033[0m"
 
-    def vertice_dict(self) -> dict[tuple[int]: list[tuple[int, ...]]]:
+    def vertice_dict(self) -> Vertice:
         """
             create a dict of vertice (jonction point of the cell )
             and match the vertice point whith 2 oposed adjoining rooms
             (Nord-west/ Sud-east) see the read me.
             The number of vertice = maze_width + 1 * maze_height + 1
         """
-        vertice: dict[tuple[int, ...]: list[tuple[int, ...]]] = {}
+        vertice: Vertice = {}
         for x in range(self.__m_h + 1):
             for y in range(self.__m_w + 1):
                 cell: tuple[int, int] = (y, x)
@@ -83,11 +85,11 @@ class Visualisation(Char_set):
         return vertice
 
     def check_if_open(self,
-                      adjoining_rooms: tuple[int, int],
-                      adjacent_cell: tuple[int, int],
+                      adjoining_rooms: tuple[int, ...],
+                      adjacent_cell: tuple[int, ...],
                       direction: str) -> str:
-        room_bit: int = self.__struct.get(adjoining_rooms)
-        adjacent_cell_bit: int = self.__struct.get(adjacent_cell)
+        room_bit: int | None = self.__struct.get(adjoining_rooms)
+        adjacent_cell_bit: int | None = self.__struct.get(adjacent_cell)
 
         # print(f"room: {adjoining_rooms,room_bit},"
         # f"adjacent cell: {adjacent_cell, adjacent_cell_bit}"
@@ -126,16 +128,16 @@ class Visualisation(Char_set):
     def get_vertice_char(self, adjoining_rooms: List[tuple[int, int]]) -> str:
 
         v: str = ""
-        w_cell: tuple[int, int] = tuple(
+        w_cell: tuple[int, ...] = tuple(
             [adjoining_rooms[0][0],
              adjoining_rooms[0][1] + 1])
-        n_cell: tuple[int, int] = tuple(
+        n_cell: tuple[int, ...] = tuple(
             [adjoining_rooms[0][0] + 1,
              adjoining_rooms[0][1]])
-        e_cell: tuple[int, int] = tuple(
+        e_cell: tuple[int, ...] = tuple(
             [adjoining_rooms[1][0],
              adjoining_rooms[1][1] - 1])
-        s_cell: tuple[int, int] = tuple(
+        s_cell: tuple[int, ...] = tuple(
             [adjoining_rooms[1][0] - 1,
              adjoining_rooms[1][1]])
 
@@ -156,14 +158,16 @@ class Visualisation(Char_set):
         v = v + west
         return self.get_char(v)
 
-    def add_char(self, char: str, number: int, color: str) -> str:
+    def add_char(self, char: str | None, number: int, color: str) -> str:
+        if char is None:
+            return ""
         line: str = f"{color}"
         for i in range(number):
             line = line + char
         line = line + f"{self.__reset}"
         return line
 
-    def is_on_vertical_set(self, char: str) -> bool:
+    def is_on_vertical_set(self, char: str | None) -> bool:
         if self.get_char("NESW") == char:
             return True
         elif self.get_char("NES") == char:
@@ -182,7 +186,7 @@ class Visualisation(Char_set):
             return True
         return False
 
-    def is_on_horizontal_set(self, char: str) -> bool:
+    def is_on_horizontal_set(self, char: str | None) -> bool:
         if self.get_char("NESW") == char:
             return True
         elif self.get_char("NES") == char:
@@ -244,7 +248,7 @@ class Visualisation(Char_set):
         print(line)
 
     def display_maze(self) -> None:
-        vertices_adjacent: Vertice_adjacent = self.vertice_dict()
+        vertices_adjacent: Vertice = self.vertice_dict()
         vertices_char: Vertice_char = {}
         for vertice in vertices_adjacent:
             # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
