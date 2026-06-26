@@ -4,6 +4,31 @@ from amazing.visualisation.color import Color
 import signal
 import sys
 
+
+def color_choice() -> str:
+    print("color (white by default): Red:1 Green:2 Yellow:3 LightPurple:4 Purple:5 Cyan:6 LightGray:7 Black:8")
+    input_user: str = input("")
+    match input_user:
+        case "1":
+            return "\033[91m"
+        case "2":
+            return "\033[92m"
+        case "3":
+            return "\033[93m"
+        case "4":
+            return "\033[94m"
+        case "5":
+            return "\033[95m"
+        case "6":
+            return "\033[96m"
+        case "7":
+            return "\033[97m"
+        case "8":
+            return "\033[90m"
+        case _:
+            print("color by default: white")
+    return  "\033[0m"
+
 def maze_menu(config_file: str) -> int:
     maze : MazeGrid = get_maze(config_file)
     visualisation_maze(maze)
@@ -19,7 +44,10 @@ def maze_menu(config_file: str) -> int:
             match user_input:
                 case "1":
                     maze : MazeGrid = get_maze(config_file)
-                    visualisation_maze(maze)
+                    visualisation_maze(maze, None)
+                case "2":
+                    maze : MazeGrid = get_maze(config_file)
+                    visualisation_maze(maze, None)
                 case "4":
                     return 0
                 case _:

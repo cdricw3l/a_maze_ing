@@ -71,9 +71,14 @@ class Char_set:
     __char_set: dict[str,str]
     def __init__(self):
         self.__char_set: dict[str,str] = {
-            "NESW" : "┼", "NES" :'├', "NEW" :'┴', "NSW": '┤', "ESW": '┬', "NE": '└',
-            "NS": '│', "NW": '┘', "ES": '┌', "EW": '─', "SW": '┐', "N": '╵', "E":'╶',
-            "S": '╷',"W":'╴', "EMPTY": '.'}
+            "NESW" : "╋", "NES" :'┣', "NEW" :'┻', "NSW": '┫', "ESW": '┳', "NE": '┗',
+            "NS": '┃', "NW": '┛', "ES": '┏', "EW": '━', "SW": '┓', "N": '╹', "E":'╺',
+            "S": '╻',"W":'╸', "EMPTY": '.'}
+        
+        # self.__char_set: dict[str,str] = {
+        #     "NESW" : "┼", "NES" :'├', "NEW" :'┴', "NSW": '┤', "ESW": '┬', "NE": '└',
+        #     "NS": '│', "NW": '┘', "ES": '┌', "EW": '─', "SW": '┐', "N": '╵', "E":'╶',
+        #     "S": '╷',"W":'╴', "EMPTY": '.'}
 
     def get_char(self, code: str) -> str:
         return self.__char_set.get(code)
@@ -221,7 +226,7 @@ class Visualisation(Char_set):
             line = line + vertices.get(v)
             if v[0] != self.__m_w:
                 if self.is_on_horizontal_set(vertices.get(v)):
-                    line = line + self.add_char("─", self.__c_w - 2)
+                    line = line + self.add_char(Char_set.get_char(self, "EW"), self.__c_w - 2)
                 else:
                     line = line + self.add_char(" ", self.__c_w - 2)
         print(line)
@@ -230,7 +235,7 @@ class Visualisation(Char_set):
         line: str = ""
         for v in vertices:
             if self.is_on_vertical_set(vertices.get(v)):
-                line = line + "│"
+                line = line + Char_set.get_char(self, "NS")
             else:
                 line = line + " "
             if v[0] != self.__m_w:
@@ -312,11 +317,15 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 
 
 
-def visualisation_maze(maze: MazeGrid) -> None:
+def visualisation_maze(maze: MazeGrid, color: str) -> None:
     
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
     output: dict[tuple[float,...]: int] = get_output(maze)
-    visualiser: Visualisation = Visualisation(10, 10, maze, output, forty_two)
+    visualiser: Visualisation = Visualisation(
+        10, 10, 
+        maze, output,
+        forty_two, color
+    )
     visualiser.display_maze()
     
    
