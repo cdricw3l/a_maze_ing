@@ -1,4 +1,6 @@
 from maze_generator.maze import MazeGrid, Cell
+from .color import Color_bg, Color_line
+
 from collections import defaultdict
 from typing import List, Set
 
@@ -72,51 +74,75 @@ class Visualisation(Char_set):
         for x in range(self.__m_h + 1):
             for y in range(self.__m_w + 1):
                 cell: tuple[int, int] = (y, x)
-                nw: tuple[int, int] = (y - 1 , x -1)
-                se: tuple[int, ...] = (y , x)
-                vertice.update({cell:list([nw, se])})
+                nw: tuple[int, int] = (y - 1, x - 1)
+                se: tuple[int, int] = (y, x)
+                vertice.update({cell: list([nw, se])})
         return vertice
-    
-    def check_if_open(self, adjoining_rooms: tuple[int, ...], adjacent_cell:tuple[int, ...], direction: str):
+
+    def check_if_open(self,
+                      adjoining_rooms: tuple[int, int],
+                      adjacent_cell: tuple[int, int],
+                      direction: str) -> str:
         room_bit: int = self.__struct.get(adjoining_rooms)
         adjacent_cell_bit: int = self.__struct.get(adjacent_cell)
 
-        #print(f"room: {adjoining_rooms,room_bit}, adjacent cell: {adjacent_cell, adjacent_cell_bit} position: {direction}")
+        # print(f"room: {adjoining_rooms,room_bit},"
+        # f"adjacent cell: {adjacent_cell, adjacent_cell_bit}"
+        # f"position: {direction}")
 
         if room_bit == None and adjacent_cell_bit == None:
-             return ""
+            return ""
         if room_bit == None or adjacent_cell_bit == None:
-             return direction
+            return direction
         if direction == "W":
-                #comparaison nord room_bit -> south ajacent cell give w
-                if ((room_bit >> Direction.SOUTH) & 1 ) == 1 and ((adjacent_cell_bit >> Direction.NORD) & 1) == 1:
-                    return "W"
+            # comparaison nord room_bit -> south ajacent cell give w
+            if ((room_bit >> Direction.SOUTH) & 1) == 1\
+                and\
+                    ((adjacent_cell_bit >> Direction.NORD) & 1) == 1:
+                return "W"
         if direction == "S":
-                #comparaison WEST room_bit -> EAST ajacent cell give s
-                if ((room_bit >> Direction.WEST) & 1 ) == 1 and ((adjacent_cell_bit >> Direction.EAST) & 1) == 1:
-                    return "S"
+            # comparaison WEST room_bit -> EAST ajacent cell give s
+            if ((room_bit >> Direction.WEST) & 1) == 1\
+                and\
+                    ((adjacent_cell_bit >> Direction.EAST) & 1) == 1:
+                return "S"
         if direction == "E":
-                #comparaison NORD room_bit -> SOUTH ajacent cell give E
-                if ((room_bit >> Direction.NORD) & 1 ) == 1 and ((adjacent_cell_bit >> Direction.SOUTH) & 1) == 1:
-                    return "E"
+            # comparaison NORD room_bit -> SOUTH ajacent cell give E
+            if ((room_bit >> Direction.NORD) & 1) == 1\
+                and\
+                    ((adjacent_cell_bit >> Direction.SOUTH) & 1) == 1:
+                return "E"
         if direction == "N":
-                #comparaison EAST room_bit -> WEST ajacent cell give N
-                if ((room_bit >> Direction.EAST) & 1 ) == 1 and ((adjacent_cell_bit >> Direction.WEST) & 1) == 1:
-                    return "N"
+            # comparaison EAST room_bit -> WEST ajacent cell give N
+            if ((room_bit >> Direction.EAST) & 1) == 1\
+                and\
+                    ((adjacent_cell_bit >> Direction.WEST) & 1) == 1:
+                return "N"
         return ""
-    
-    
-    def get_vertice_char(self, adjoining_rooms: List[tuple[int, ...]])  -> str:
-        
+
+    def get_vertice_char(self, adjoining_rooms: List[tuple[int, int]]) -> str:
+
         v: str = ""
-        w_cell: tuple[int] = tuple([adjoining_rooms[0][0], adjoining_rooms[0][1] + 1])
-        n_cell: tuple[int, ...] = tuple([adjoining_rooms[0][0] + 1, adjoining_rooms[0][1]])
-        e_cell: tuple[int] = tuple([adjoining_rooms[1][0] , adjoining_rooms[1][1] - 1])
-        s_cell: tuple[int] = tuple([adjoining_rooms[1][0] - 1 , adjoining_rooms[1][1]])
+        w_cell: tuple[int, int] = tuple(
+            [adjoining_rooms[0][0],
+             adjoining_rooms[0][1] + 1])
+        n_cell: tuple[int, int] = tuple(
+            [adjoining_rooms[0][0] + 1,
+             adjoining_rooms[0][1]])
+        e_cell: tuple[int, int] = tuple(
+            [adjoining_rooms[1][0],
+             adjoining_rooms[1][1] - 1])
+        s_cell: tuple[int, int] = tuple(
+            [adjoining_rooms[1][0] - 1,
+             adjoining_rooms[1][1]])
 
         # print(f"adjoining root: {adjoining_rooms}")
-        # print(f"vertice: {vertice}, w: {w_cell}, n: {n_cell}, e: {e_cell}, s: {s_cell}")
-        
+        # print(f"vertice: {vertice}, "
+        # f"w: {w_cell}, "
+        # f"n: {n_cell}, "
+        # f"e: {e_cell}, "
+        # f"s: {s_cell}")
+
         nord: str = self.check_if_open(adjoining_rooms[0], n_cell, "N")
         v = v + nord
         east: str = self.check_if_open(adjoining_rooms[1], e_cell, "E")
@@ -127,9 +153,8 @@ class Visualisation(Char_set):
         v = v + west
         return self.get_char(v)
 
-
     def add_char(self, char: str, number: int, color: str) -> str:
-        line : str = f"{color}"
+        line: str = f"{color}"
         for i in range(number):
             line = line + char
         line = line + f"{self.__reset}"
@@ -153,8 +178,8 @@ class Visualisation(Char_set):
         elif self.get_char("S") == char:
             return True
         return False
-    
-    def is_on_horizontal_set(self, char:str) -> bool:
+
+    def is_on_horizontal_set(self, char: str) -> bool:
         if self.get_char("NESW") == char:
             return True
         elif self.get_char("NES") == char:
@@ -179,9 +204,15 @@ class Visualisation(Char_set):
             line = line + f"{self.__color}{vertices.get(v)}{self.__reset}"
             if v[0] != self.__m_w:
                 if self.is_on_horizontal_set(vertices.get(v)):
-                    line = line + self.add_char(Char_set.get_char(self, "EW"), self.__c_w - 2, self.__color)
+                    line = line + self.add_char(
+                        Char_set.get_char(self, "EW"),
+                        self.__c_w - 2,
+                        self.__color)
                 else:
-                    line = line + self.add_char(" ", self.__c_w - 2, self.__color)
+                    line = line + self.add_char(
+                        " ",
+                        self.__c_w - 2,
+                        self.__color)
         print(line)
 
     def create_v_line(self, vertices: dict[tuple[int, ...], str]) -> None:
@@ -193,13 +224,13 @@ class Visualisation(Char_set):
                 line = line + " "
             if v[0] != self.__m_w:
                 if v == self.__entry:
-                    line = line + self.add_char(f"\033[42m \033[00m", self.__c_w - 2, self.__reset)
+                    line = line + self.add_char(" ", self.__c_w - 2, Color_bg.GREEN)
                 elif v == self.__exit:
-                    line = line + self.add_char(f"\033[41m \033[00m", self.__c_w - 2, self.__reset)
+                    line = line + self.add_char(" ", self.__c_w - 2, Color_bg.RED)
                 elif v in self.__forty_two:
                     line = line + self.add_char(" ", self.__c_w - 2, self.__forty_two_color)
                 else:
-                    line = line + self.add_char(" ", self.__c_w - 2, self.__reset)
+                    line = line + self.add_char(" ", self.__c_w - 2, Color_bg.WHITE)
         print(line)
 
     def display_maze(self) -> None:
