@@ -4,14 +4,14 @@ from visualisation import visualisation_maze
 
 def color_line() -> str:
     print(f"=== 42 maze colors === (white by default)\n\
-1:{Color_line.BLACK}Black{Color_bg.RESET}\n\
-2:{Color_line.RED}Red{Color_bg.RESET}\n\
-3:{Color_line.GREEN}Green{Color_bg.RESET}\n\
-4:{Color_line.YELLOW}Yellow{Color_bg.RESET}\n\
-5:{Color_line.BLUE}Blue{Color_bg.RESET}\n\
-6:{Color_line.PURPLE}Purple{Color_bg.RESET}\n\
-7:{Color_line.CYAN}Cyan{Color_bg.RESET}\n\
-8:{Color_line.WHITE}White{Color_bg.RESET}")
+1:{Color_line.BLACK}Black{Color_line.RESET}\n\
+2:{Color_line.RED}Red{Color_line.RESET}\n\
+3:{Color_line.GREEN}Green{Color_line.RESET}\n\
+4:{Color_line.YELLOW}Yellow{Color_line.RESET}\n\
+5:{Color_line.BLUE}Blue{Color_line.RESET}\n\
+6:{Color_line.PURPLE}Purple{Color_line.RESET}\n\
+7:{Color_line.CYAN}Cyan{Color_line.RESET}\n\
+8:{Color_line.WHITE}White{Color_line.RESET}")
     input_user: str = input("Choice? (1-9): ")
     match input_user:
         case "1":
@@ -25,14 +25,14 @@ def color_line() -> str:
         case "5":
             return Color_line.BLUE
         case "6":
-            return Color_bg.PURPLE
-        case "7":
             return Color_line.PURPLE
+        case "7":
+            return Color_line.CYAN
         case "8":
             return Color_line.WHITE
         case _:
             print("color by default: white")
-            return Color_bg.WHITE
+            return Color_line.WHITE
 
 def forty_two_colors() -> str:
     print(f"=== 42 background colors === (white by default)\n\

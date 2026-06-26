@@ -1,15 +1,18 @@
 from maze_generator.maze import MazeGrid, Cell
-from .color import Color_bg, Color_line
-
+from .color import Color_bg
 from collections import defaultdict
 from typing import List, Set
+
+
+Vertice_adjacent = dict[tuple[int, ...]: list[tuple[int, ...]]]
+Vertice_char = dict[tuple[int, int], str]
 
 
 class Char_set:
 
     __char_set: dict[str, str]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.__char_set: dict[str, str] = {
             "NESW": "╋", "NES": '┣', "NEW": '┻',
             "NSW": '┫', "ESW": '┳', "NE": '┗',
@@ -17,7 +20,7 @@ class Char_set:
             "EW": '━', "SW": '┓', "N": '╹',
             "E": '╺', "S": '╻', "W": '╸'}
 
-    def get_char(self, code: str) -> str:
+    def get_char(self, code: str) -> str | None:
         return self.__char_set.get(code)
 
 
@@ -90,9 +93,9 @@ class Visualisation(Char_set):
         # f"adjacent cell: {adjacent_cell, adjacent_cell_bit}"
         # f"position: {direction}")
 
-        if room_bit == None and adjacent_cell_bit == None:
+        if room_bit is None and adjacent_cell_bit is None:
             return ""
-        if room_bit == None or adjacent_cell_bit == None:
+        if room_bit is None or adjacent_cell_bit is None:
             return direction
         if direction == "W":
             # comparaison nord room_bit -> south ajacent cell give w
@@ -219,32 +222,40 @@ class Visualisation(Char_set):
         line: str = ""
         for v in vertices:
             if self.is_on_vertical_set(vertices.get(v)):
-                line = line + f"{self.__color}{Char_set.get_char(self, "NS")}{self.__reset}"
+                line = line + \
+                    f"{self.__color}" \
+                    f"{Char_set.get_char(self, 'NS')}" \
+                    f"{self.__reset}"
             else:
                 line = line + " "
             if v[0] != self.__m_w:
                 if v == self.__entry:
-                    line = line + self.add_char(" ", self.__c_w - 2, Color_bg.GREEN)
+                    line = line + self \
+                        .add_char(" ", self.__c_w - 2, Color_bg.GREEN)
                 elif v == self.__exit:
-                    line = line + self.add_char(" ", self.__c_w - 2, Color_bg.RED)
+                    line = line + self \
+                        .add_char(" ", self.__c_w - 2, Color_bg.RED)
                 elif v in self.__forty_two:
-                    line = line + self.add_char(" ", self.__c_w - 2, self.__forty_two_color)
+                    line = line + self \
+                        .add_char(" ", self.__c_w - 2, self.__forty_two_color)
                 else:
-                    line = line + self.add_char(" ", self.__c_w - 2, Color_bg.TRANSPARANT)
+                    line = line + self \
+                        .add_char(" ", self.__c_w - 2, Color_bg.TRANSPARANT)
         print(line)
 
     def display_maze(self) -> None:
-        vertices_and_adjacent: dict[tuple[int, ...]: list[tuple[int, ...]]] = self.vertice_dict()
-        vertices_and_char: dict[tuple[int, ...], str] = {}
-        for vertice in vertices_and_adjacent:
-            #print(f"{vertice}, ajoining :{vertices.get(vertice)}")
-            charactere: str = self.get_vertice_char(vertices_and_adjacent.get(vertice))
-            vertices_and_char.update({vertice:charactere})
-        
+        vertices_adjacent: Vertice_adjacent = self.vertice_dict()
+        vertices_char: Vertice_char = {}
+        for vertice in vertices_adjacent:
+            # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
+            charactere: str = self \
+                .get_vertice_char(vertices_adjacent.get(vertice))
+            vertices_char.update({vertice: charactere})
+
         for i in range(self.__m_h + 1):
-            new_v: dict[tuple[int, ...], str] = {k:vertices_and_char[k] for k in vertices_and_char if k[1] == i}
+            new_v: dict[tuple[int, int], str] = \
+                {k: vertices_char[k] for k in vertices_char if k[1] == i}
             self.create_h_line(new_v)
-            assert(self.__c_h == 10)
             for j in range(3):
                 self.create_v_line(new_v)
 
@@ -255,45 +266,54 @@ class Visualisation(Char_set):
         self.__color = color
 
 
+def bytes_direction_activation(
+        cell: tuple[float, float],
+        open_neighbors: List[Cell]
+        ) -> int:
 
-def bytes_direction_activation(cell: tuple[float, ...], open_neighbors: List[Cell]) -> int :
-
-    west: tuple[float, ...] = (cell[0] - 1 , cell[1])
-    sud: tuple[float, ...] = (cell[0] , cell[1] + 1)
-    est: tuple[float, ...] = (cell[0] + 1 , cell[1]) 
-    nord: tuple[float, ...] = (cell[0] , cell[1] - 1) 
+    west: tuple[float, float] = (cell[0] - 1, cell[1])
+    sud: tuple[float, float] = (cell[0], cell[1] + 1)
+    est: tuple[float, float] = (cell[0] + 1, cell[1])
+    nord: tuple[float, float] = (cell[0], cell[1] - 1)
 
     # the binary value of 0 is 0000
     value: int = 0
 
-    #this mask active the first bit for the West wall
-    # if the West variable tuple is not on open neighbour list this bit is activate the wall is closed an value
+    # this mask active the first bit for the West wall
+    # if the West variable tuple is not on open neighbour list
+    # this bit is activate the wall is closed an value
     if west not in open_neighbors:
         value = value | (1 << 3)
-    #this mask active the second bit for the South wall
-    # if the South variable tuple is not on open neighbour list this bit is activate the wall is closed
+    # this mask active the second bit for the South wall
+    # if the South variable tuple is not on open neighbour list
+    # this bit is activate the wall is closed
     if sud not in open_neighbors:
         value = value | (1 << 2)
-    #this mask active the third bit for the Est wall
-    # if the Est variable tuple is on open neighbour list this bit is activate the wall is closed
+    # this mask active the third bit for the Est wall
+    # if the Est variable tuple is on open neighbour list
+    # this bit is activate the wall is closed
     if est not in open_neighbors:
         value = value | (1 << 1)
-    #this mask active the fourth bit for the Nord wall
-    # if the Nord variable tuple is on open neighbour list this bit is activate the wall is closed
+    # this mask active the fourth bit for the Nord wall
+    # if the Nord variable tuple is on open neighbour list
+    # this bit is activate the wall is closed
     if nord not in open_neighbors:
         value = value | (1 << 0)
 
     return value
-     
 
-def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
-    
-    """ 
-    return a dict with cell coordonee as key and 
-    integer value who represente which wall is open 
-    exemple: WSEN -> 0100 -> West is open, south is closed, east is open and nord is open
-    exemple: WSEN -> 0000 -> all the wall are open 
-    exemple: WSEN -> 1111 -> all the wall are closed 
+
+def get_output(maze: MazeGrid) -> dict[tuple[float,  float]: int]:
+
+    """
+    return a dict with cell coordonee as key and
+    integer value who represente which wall is open
+    exemple: WSEN -> 0100:
+    West is open, south is closed, east is open and nord is open
+    exemple: WSEN -> 0000:
+    all the wall are open
+    exemple: WSEN -> 1111:
+    all the wall are closed
     """
     graph: defaultdict[Cell, List[Cell]] = maze.graph
     output: dict[tuple[float, ...]: int] = {}
@@ -301,22 +321,22 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
         open_neighbors: list[Cell] = graph.get(cell)
         key: tuple[float, ...] = cell
         value: int = bytes_direction_activation(key, open_neighbors)
-        output.update({key:value})
-    
+        output.update({key: value})
     return output
 
 
+def visualisation_maze(
+        maze: MazeGrid,
+        line_color,
+        forty_two_color: str = "\033[45m"
+        ) -> None:
 
-def visualisation_maze(maze: MazeGrid, line_color, forty_color: str ="\033[45m") -> None:
-    
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
-    output: dict[tuple[float,...]: int] = get_output(maze)
+    output: dict[tuple[float, float]: int] = get_output(maze)
     visualiser: Visualisation = Visualisation(
-        10, 10, 
+        10, 10,
         maze, output,
         forty_two, line_color,
-        forty_color
+        forty_two_color
     )
     visualiser.display_maze()
-    
-   
