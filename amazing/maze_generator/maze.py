@@ -112,10 +112,20 @@ class MazeGrid:
         x: int = width / 2
         y: int = height / 2
         forbidden = {
-            (x+1, y), (x+2, y), (x-1, y), (x-2, y),
-            (x+1, y+2), (x+1, y-2), (x+1, y-1),
-            (x+2, y+2), (x+2, y+1), (x+2, y-2),
-            (x-2, y+2), (x-2, y+1), (x-1, y-1), (x-1, y-2)
+            (x+1, y),
+            (x+2, y),
+            (x-1, y), 
+            (x-2, y),
+            (x+1, y+2),
+            (x+1, y-2),
+            (x+1, y-1),
+            (x+2, y+2),
+            (x+2, y+1),
+            (x+2, y-2),
+            (x-2, y+2),
+            (x-2, y+1), 
+            (x-1, y-1),
+            (x-1, y-2)
         }
         return forbidden
 

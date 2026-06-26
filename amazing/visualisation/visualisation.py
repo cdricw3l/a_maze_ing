@@ -91,8 +91,9 @@ class Visualisation(Char_set):
     __m_w: float
     __entry: tuple[int, int]
     __exit: tuple[int, int]
+    __struct: dict[tuple[float, ...]: int]
 
-    def __init__(self, c_h: float, c_w: float, maze: MazeGrid, maze_structure: dict[tuple[float, ...]: int]):
+    def __init__(self, c_h: float, c_w: float, maze: MazeGrid, maze_structure: dict[tuple[float, ...]: int], forty_two: Set[Cell]):
         super().__init__()
         self.__c_h = c_h
         self.__c_w = c_w
@@ -100,6 +101,7 @@ class Visualisation(Char_set):
         self.__m_w = maze.width
         self.__entry = maze.entry
         self.__exit = maze.exit
+        self.__forty_two = forty_two
         self.__struct  = maze_structure
 
     def vertice_dict(self) -> dict[tuple[int]: list[tuple[int, ...]]]:
@@ -219,7 +221,6 @@ class Visualisation(Char_set):
             line = line + vertices.get(v)
             if v[0] != self.__m_w:
                 if self.is_on_horizontal_set(vertices.get(v)):
-                    assert(self.__c_w == 10)
                     line = line + self.add_char("─", self.__c_w - 2)
                 else:
                     line = line + self.add_char(" ", self.__c_w - 2)
@@ -237,6 +238,8 @@ class Visualisation(Char_set):
                     line = line + self.add_char("\033[42m \033[00m", self.__c_w - 2)
                 elif v == self.__exit:
                     line = line + self.add_char("\033[41m \033[00m", self.__c_w - 2)
+                elif v in self.__forty_two:
+                    line = line + self.add_char("\033[45m \033[00m", self.__c_w - 2)
                 else:
                     line = line + self.add_char(" ", self.__c_w - 2)
         print(line)
@@ -310,8 +313,10 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,...]: int]:
 
 
 def visualisation_maze(maze: MazeGrid) -> None:
-  
-    visualiser: Visualisation = Visualisation(10, 10, maze, get_output(maze))
+    
+    forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
+    output: dict[tuple[float,...]: int] = get_output(maze)
+    visualiser: Visualisation = Visualisation(10, 10, maze, output, forty_two)
     visualiser.display_maze()
     
    
