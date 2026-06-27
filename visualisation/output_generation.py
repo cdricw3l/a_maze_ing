@@ -111,6 +111,7 @@ class Output:
         visited.append(current)
         for cell in neighbour:
             if cell not in visited:
+                
                 path = path + self.get_direction(current, cell)
                 #print(f"string {string}")
                 self.shortest_path(cell , self.__graph.get(cell), visited, path)
