@@ -12,7 +12,7 @@ run:
 	@python3 $(NAME) $(CONFIG)
 
 debug:
-	@python3 $(PDB)  $(NAME) $(CONFIG)
+	@python3 $(PDB) $(NAME) $(CONFIG)
 lt: 
 	@$(MYPY)
 
