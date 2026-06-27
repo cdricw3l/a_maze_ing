@@ -76,7 +76,7 @@ def maze_menu(config_file: str) -> int:
     maze: MazeGrid = get_maze(config_file)
     color_l: str = Color_line.DEFAULT
     color_bg: str = Color_bg.DEFAULT
-    state: bool = visualisation_maze(maze, color_l, color_bg)
+    state: bool = visualisation_maze(maze, color_l, color_bg, Color_bg.YELLOW)
     try:
         while state:
             print("=== A-Maze-ing ===")
@@ -93,13 +93,14 @@ def maze_menu(config_file: str) -> int:
                 case "2":
                     state = visualisation_maze(maze,
                                                Color_line.DEFAULT,
-                                               Color_bg.DEFAULT)
+                                               Color_bg.DEFAULT,
+                                               Color_bg.YELLOW)
                 case "3":
                     color_l = color_line()
-                    state = visualisation_maze(maze, color_l, color_bg)
+                    state = visualisation_maze(maze, color_l, color_bg, Color_bg.YELLOW)
                 case "4":
                     color_bg = forty_two_colors()
-                    state = visualisation_maze(maze, color_l, color_bg)
+                    state = visualisation_maze(maze, color_l, color_bg, Color_bg.YELLOW)
                 case "5":
                     return 0
                 case _:

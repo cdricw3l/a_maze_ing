@@ -1,7 +1,6 @@
 from maze_generator.maze import MazeGrid, Cell
 from .color import Color_bg
 from .output_generation import Output_creation_error, Output
-from collections import defaultdict
 from typing import List, Set
 
 Vertex_char = dict[Cell, str]
@@ -48,9 +47,11 @@ class Visualisation(Char_set):
     __m_w: int
     __entry: tuple[int, int]
     __exit: tuple[int, int]
+    __shortest_path: dict[Cell, str]
     __struct: dict[Cell, int]
     __color: str
     __forty_two_color: str
+    __path_color: str
     __reset: str
 
     def __init__(
@@ -59,9 +60,11 @@ class Visualisation(Char_set):
             c_w: int,
             maze: MazeGrid,
             maze_structure: dict[Cell, int],
+            shortest_path: dict[Cell, int],
             forty_two: Set[Cell],
-            color: str = "\033[0m",
-            forty_two_color: str = "\033[45m"
+            color_line: str ,
+            forty_two_color: str,
+            shortest_path_color: str
             ) -> None:
         super().__init__()
         self.__c_h = c_h
@@ -70,10 +73,12 @@ class Visualisation(Char_set):
         self.__m_w = maze.width
         self.__entry = maze.entry
         self.__exit = maze.exit
+        self.__shortest_path = shortest_path
         self.__forty_two = forty_two
         self.__struct = maze_structure
-        self.__color = color
+        self.__color = color_line
         self.__forty_two_color = forty_two_color
+        self.__path_color = shortest_path_color
         self.__reset = "\033[0m"
 
     def set_bg_color(self, color: str) -> None:
@@ -306,6 +311,9 @@ class Visualisation(Char_set):
                 elif v in self.__forty_two:
                     line = line + self \
                         .add_char(" ", self.__c_w - 2, self.__forty_two_color)
+                elif v in self.__shortest_path:
+                    line = line + self \
+                        .add_char(" ", self.__c_w - 2, self.__path_color)
                 else:
                     line = line + self \
                         .add_char(" ", self.__c_w - 2, Color_bg.TRANSPARANT)
@@ -329,71 +337,11 @@ class Visualisation(Char_set):
         print(line)
 
 
-def bytes_direction_activation(
-        cell: tuple[float, float],
-        open_neighbors: List[Cell]
-        ) -> int:
-
-    west: tuple[float, float] = (cell[0] - 1, cell[1])
-    sud: tuple[float, float] = (cell[0], cell[1] + 1)
-    est: tuple[float, float] = (cell[0] + 1, cell[1])
-    nord: tuple[float, float] = (cell[0], cell[1] - 1)
-
-    # the binary value of 0 is 0000
-    value: int = 0
-
-    # this mask active the first bit for the West wall
-    # if the West variable tuple is not on open neighbour list
-    # this bit is activate the wall is closed an value
-    if west not in open_neighbors:
-        value = value | (1 << 3)
-    # this mask active the second bit for the South wall
-    # if the South variable tuple is not on open neighbour list
-    # this bit is activate the wall is closed
-    if sud not in open_neighbors:
-        value = value | (1 << 2)
-    # this mask active the third bit for the Est wall
-    # if the Est variable tuple is on open neighbour list
-    # this bit is activate the wall is closed
-    if est not in open_neighbors:
-        value = value | (1 << 1)
-    # this mask active the fourth bit for the Nord wall
-    # if the Nord variable tuple is on open neighbour list
-    # this bit is activate the wall is closed
-    if nord not in open_neighbors:
-        value = value | (1 << 0)
-
-    return value
-
-
-def get_output(maze: MazeGrid) -> dict[Cell, int]:
-
-    """
-        return a dict with cell coordonee as key and
-        integer value who represente which wall is open
-        exemple: WSEN -> 0100:
-        West is open, south is closed, east is open and nord is open
-        exemple: WSEN -> 0000:
-        all the wall are open
-        exemple: WSEN -> 1111:
-        all the wall are closed
-    """
-    graph: defaultdict[Cell, List[Cell]] = maze.graph
-    output: dict[tuple[int, int], int] = {}
-    for cell in graph:
-        open_neighbors: list[Cell] | None = graph.get(cell)
-        if open_neighbors is None:
-            raise Output_creation_error
-        key: Cell = cell
-        value: int = bytes_direction_activation(key, open_neighbors)
-        output.update({key: value})
-    return output
-
-
 def visualisation_maze(
         maze: MazeGrid,
         line_color: str,
-        forty_two_color: str
+        forty_two_color: str,
+        shortest_path_color: str
         ) -> bool:
 
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
@@ -401,16 +349,17 @@ def visualisation_maze(
         output: Output = Output(maze.graph, maze.entry, maze.exit)
         maze_structure: dict[Cell, int] = output.get_maze_structure()
         # print(f"start {maze.entry, maze.graph.get(maze.entry)}")
-        output.shortest_path()
-        output.write_output_file(maze.height)
-        # print(f"path:{output.get_shortest_path()}")
+        output.shortest_path_generation()
+
+        print(f"path:{"".join([output.get_shortest_path()[k] for k in output.get_shortest_path()])}")
         visualiser: Visualisation = Visualisation(
             10, 10,
-            maze, maze_structure,
+            maze, maze_structure, output.get_shortest_path(),
             forty_two, line_color,
-            forty_two_color
+            forty_two_color, shortest_path_color
         )
-        #visualiser.display_maze()
+        visualiser.display_maze()
+        output.write_output_file(maze.height)
         return True
     except (Output_creation_error, Display_creation_error) as e:
         print(e)

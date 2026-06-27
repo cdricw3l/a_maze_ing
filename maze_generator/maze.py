@@ -5,7 +5,7 @@ import random
 import sys
 
 Cell = Tuple[int, int]
-
+Graph = DefaultDict[Cell, List[Cell]]
 
 class MazeValidationError(ValueError):
     """Raised when a maze graph structure is invalid."""
