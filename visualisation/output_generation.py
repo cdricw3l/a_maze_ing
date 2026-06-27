@@ -11,11 +11,15 @@ class Output_creation_error(Exception):
 class Output:
 
     __graph: defaultdict[Cell, List[Cell]]
+    __entry: Cell
+    __exit: Cell
 
-    def __init__(self, graph: defaultdict[Cell, List[Cell]]) -> None:
+    def __init__(self, graph: defaultdict[Cell, List[Cell]], entry: Cell, exit: Cell) -> None:
         if graph is None:
             raise Output_creation_error
         self.__graph = graph
+        self.__entry = entry
+        self.__exit = exit
 
     def bytes_direction_activation(self,
                                    cell: tuple[float, float],
@@ -75,3 +79,19 @@ class Output:
             value: int = self.bytes_direction_activation(key, open_neighbors)
             output.update({key: value})
         return output
+
+    def shortest_path(self, current: Cell, neighbour: list[Cell], previous: Cell) -> bool:
+
+
+
+        if len(neighbour) == 0:
+            return False
+        if current == self.__exit:
+            print(f"sortie found {current}")
+            return True
+        
+        print(f"cell: {current} neighbour {neighbour}")
+        for cell in neighbour:
+            if cell is not previous:
+                self.shortest_path(cell , self.__graph.get(cell), current)
+        return True

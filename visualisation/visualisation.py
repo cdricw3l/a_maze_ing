@@ -399,15 +399,18 @@ def visualisation_maze(
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
 
     try:
-        output: dict[Cell, int] = Output(maze.graph).get_maze_structure()
-        visualiser: Visualisation = Visualisation(
-            10, 10,
-            maze, output,
-            forty_two, line_color,
-            forty_two_color
-        )
-        visualiser.display_maze()
-        return True
+        output: Output = Output(maze.graph, maze.entry, maze.exit)
+        #maze_structure: dict[Cell, int] = Output(maze.graph).get_maze_structure()
+        print(f"start {maze.entry, maze.graph.get(maze.entry)}")
+        output.shortest_path(maze.entry, maze.graph.get(maze.entry), maze.entry)
+        # visualiser: Visualisation = Visualisation(
+        #     10, 10,
+        #     maze, maze_structure,
+        #     forty_two, line_color,
+        #     forty_two_color
+        # )
+        # visualiser.display_maze()
+        # return True
     except (Output_creation_error, Display_creation_error) as e:
         print(e)
         return False
