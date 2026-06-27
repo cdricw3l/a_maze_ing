@@ -110,7 +110,6 @@ def _parse_coord(value: str) -> Tuple[int, int]:
     return x, y
 
 
-
 def validate_entry(
     value: Optional[str], width: int, height: int
 ) -> Tuple[int, int]:
@@ -122,6 +121,7 @@ def validate_entry(
                f"for width={width}, height={height}")
         raise ConfigError(msg)
     return x, y
+
 
 def validate_exit(
     value: Optional[str], width: int, height: int

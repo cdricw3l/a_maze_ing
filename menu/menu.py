@@ -3,6 +3,7 @@ from maze_generator.maze import MazeGrid, get_maze
 from visualisation.visualisation import visualisation_maze
 import time
 
+
 def color_line() -> str:
     print(f"=== 42 maze colors === (white by default)\n\
 1:{Color_line.BLACK}Black{Color_line.RESET}\n\
@@ -78,7 +79,12 @@ def maze_menu(config_file: str) -> int:
     color_bg: str = Color_bg.DEFAULT
     color_path: str = Color_bg.YELLOW
     path_state: bool = False
-    state: bool = visualisation_maze(maze, color_l, color_bg, color_path, path_state)
+    state: bool = visualisation_maze(
+        maze,
+        color_l,
+        color_bg,
+        color_path,
+        path_state)
     try:
         while state:
             print("=== A-Maze-ing ===")
@@ -92,9 +98,14 @@ def maze_menu(config_file: str) -> int:
             match user_input:
                 case "1":
                     maze = get_maze(config_file)
-                    state = visualisation_maze(maze, color_l, color_bg, color_path, path_state)
+                    state = visualisation_maze(
+                        maze,
+                        color_l,
+                        color_bg,
+                        color_path,
+                        path_state)
                 case "2":
-                    if path_state == False:
+                    if path_state is False:
                         path_state = True
                     else:
                         path_state = False
@@ -104,17 +115,34 @@ def maze_menu(config_file: str) -> int:
                                                color_path, path_state)
                 case "3":
                     color_l = color_line()
-                    state = visualisation_maze(maze, color_l, color_bg, color_path, path_state)
+                    state = visualisation_maze(
+                        maze,
+                        color_l,
+                        color_bg,
+                        color_path,
+                        path_state)
                 case "4":
-                    color_bg = background_color("=== 42 background colors === (white by default)")
-                    state = visualisation_maze(maze, color_l, color_bg, color_path, path_state)
+                    color_bg = background_color(
+                        "=== 42 background colors === (white by default)")
+                    state = visualisation_maze(maze,
+                                               color_l,
+                                               color_bg,
+                                               color_path,
+                                               path_state)
                 case "5":
-                    color_path = background_color("=== 42 shortest path colors === (green by default)")
-                    state = visualisation_maze(maze, color_l, color_bg, color_path, path_state)
+                    color_path = background_color(
+                        "=== 42 shortest path colors === (green by default)")
+                    state = visualisation_maze(maze,
+                                               color_l,
+                                               color_bg,
+                                               color_path,
+                                               path_state)
                 case "6":
                     return 0
                 case _:
-                    print(f"{Color_line.RED}Choose a valide input between 1-4 or quit with 5{Color_line.RESET}")
+                    print(f"{Color_line.RED}"
+                          f"Choose a valide input between 1-4 "
+                          f"or quit with 5{Color_line.RESET}")
                     time.sleep(0.5)
                     continue
     except (Exception, KeyboardInterrupt) as e:

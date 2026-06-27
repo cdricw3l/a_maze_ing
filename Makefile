@@ -25,7 +25,7 @@ lint-strict:
 	flake8 .
 
 clean:
-	find . -type d \( -name "*.mypy_cache" -o -name "*__pycache__" -name ".venv" \) -exec rm -rf {} \;
+	find . -type d \( -name "*.mypy_cache" -o -name "*__pycache__" -o  -name "*venv" \) -exec rm -rf {} \;
 
 fclean: clean
 	rm -rf $(VENV)

@@ -1,11 +1,12 @@
 from collections import defaultdict
-from typing import DefaultDict, Iterable, List, Tuple, Set, Optional
+from typing import DefaultDict, List, Tuple, Set, Optional
 from parsing.parse_config import Config, parse_config, ConfigError
 import random
 import sys
 
 Cell = Tuple[int, int]
 Graph = DefaultDict[Cell, List[Cell]]
+
 
 class MazeValidationError(ValueError):
     """Raised when a maze graph structure is invalid."""
@@ -18,7 +19,11 @@ class MazeGrid:
     validated by the caller.
     """
 
-    def __init__(self, width: int, height: int, entry: Cell, exit: Cell) -> None:
+    def __init__(self,
+                 width: int,
+                 height: int,
+                 entry: Cell,
+                 exit: Cell) -> None:
         self.width = width
         self.height = height
         self.entry = entry
@@ -114,7 +119,7 @@ class MazeGrid:
         forbidden = {
             (x+1, y),
             (x+2, y),
-            (x-1, y), 
+            (x-1, y),
             (x-2, y),
             (x+1, y+2),
             (x+1, y-2),
@@ -123,7 +128,7 @@ class MazeGrid:
             (x+1, y+1),
             (x+2, y-2),
             (x-1, y+2),
-            (x-1, y+1), 
+            (x-1, y+1),
             (x-2, y-1),
             (x-2, y-2)
         }
@@ -186,6 +191,3 @@ def get_maze(config_file: str) -> MazeGrid:
         sys.exit(1)
     maze: MazeGrid = run_algorithm(config)
     return maze
-
-# if __name__ == '__main__':
-#     get_maze()
