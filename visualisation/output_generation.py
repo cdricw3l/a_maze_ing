@@ -13,6 +13,7 @@ class Output:
     __graph: defaultdict[Cell, List[Cell]]
     __entry: Cell
     __exit: Cell
+    __shortest_path: str
 
     def __init__(self, graph: defaultdict[Cell, List[Cell]], entry: Cell, exit: Cell) -> None:
         if graph is None:
@@ -20,6 +21,12 @@ class Output:
         self.__graph = graph
         self.__entry = entry
         self.__exit = exit
+    
+    def set_shortest_path(self, path: str) -> None:
+        self.__shortest_path = path
+
+    def get_shortest_path(self) -> str:
+        return str(self.__shortest_path)
 
     def bytes_direction_activation(self,
                                    cell: tuple[float, float],
@@ -79,19 +86,34 @@ class Output:
             value: int = self.bytes_direction_activation(key, open_neighbors)
             output.update({key: value})
         return output
-
-    def shortest_path(self, current: Cell, neighbour: list[Cell], previous: Cell) -> bool:
-
-
+    
+    def get_direction(self, current: Cell, neighbour: Cell) -> str:
+        if neighbour[0] == current[0] and neighbour[1] == current[1] - 1:
+            return "N"
+        if neighbour[0] == current[0] and neighbour[1] == current[1] + 1:
+            return "S"
+        if neighbour[0] == current[0] + 1 and neighbour[1] == current[1]:
+            return "E"
+        if neighbour[0] == current[0] - 1 and neighbour[1] == current[1]:
+            return "W"
+    
+    def shortest_path(self, current: Cell, neighbour: list[Cell], visited: list, path: str = "") -> bool:
 
         if len(neighbour) == 0:
             return False
         if current == self.__exit:
-            print(f"sortie found {current}")
+            #print(f"sortie found: {len(string)} {current}")
+            #print(f"path: {string}")
+            self.set_shortest_path(path)
             return True
         
-        print(f"cell: {current} neighbour {neighbour}")
+        #print(f"cell: {current} neighbour {neighbour}")
+        visited.append(current)
         for cell in neighbour:
-            if cell is not previous:
-                self.shortest_path(cell , self.__graph.get(cell), current)
+            if cell not in visited:
+                path = path + self.get_direction(current, cell)
+                #print(f"string {string}")
+                self.shortest_path(cell , self.__graph.get(cell), visited, path)
+                #print(f"delete char {string}")
+                path = path[:-1]
         return True
