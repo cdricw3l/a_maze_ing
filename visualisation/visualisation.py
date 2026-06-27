@@ -8,12 +8,16 @@ Vertice_char = dict[tuple[int, int], str]
 Vertice = dict[tuple[int, int], list[tuple[int, int]]]
 
 class Output_creation_error(Exception):
-    def __init__(self, *args) -> None:
-        super().__init__(*args)
+    def __init__(self) -> None:
+        super().__init__("Output file creation error")
 
 class Vertice_creation_error(Exception):
-    def __init__(self, *args) -> None:
-        super().__init__(*args)
+    def __init__(self) -> None:
+        super().__init__("Error vertices contruction set")
+
+class Display_creation_error(Exception):
+    def __init__(self) -> None:
+        super().__init__("Display creation error")
 
 class Char_set:
 
@@ -72,6 +76,12 @@ class Visualisation(Char_set):
         self.__color = color
         self.__forty_two_color = forty_two_color
         self.__reset = "\033[0m"
+
+    def set_bg_color(self, color: str) -> None:
+        self.__forty_two_color = color
+
+    def set_line_color(self, color: str) -> None:
+        self.__color = color
 
     def vertice_dict(self) -> Vertice:
         """
@@ -221,8 +231,11 @@ class Visualisation(Char_set):
             line = line + f"{self.__color}{vertices.get(v)}{self.__reset}"
             if v[0] != self.__m_w:
                 if self.is_on_horizontal_set(vertices.get(v)):
+                    vertice_char: str | None = Char_set.get_char(self, "EW")
+                    if vertice_char is None:
+                        raise Vertice_creation_error
                     line = line + self.add_char(
-                        Char_set.get_char(self, "EW"),
+                        vertice_char,
                         self.__c_w - 2,
                         self.__color)
                 else:
@@ -234,6 +247,7 @@ class Visualisation(Char_set):
         return line
 
     def create_v_line(self, vertices: dict[Cell, str]) -> str | None:
+        """ inter vertices creation line """
         line: str = ""
         for v in vertices:
             if self.is_on_vertical_set(vertices.get(v)):
@@ -244,12 +258,15 @@ class Visualisation(Char_set):
             else:
                 line = line + " "
             if v[0] != self.__m_w:
+                # color the entry background
                 if v == self.__entry:
                     line = line + self \
                         .add_char(" ", self.__c_w - 2, Color_bg.GREEN)
+                # color the exit background
                 elif v == self.__exit:
                     line = line + self \
                         .add_char(" ", self.__c_w - 2, Color_bg.RED)
+                # color the 42 logo background
                 elif v in self.__forty_two:
                     line = line + self \
                         .add_char(" ", self.__c_w - 2, self.__forty_two_color)
@@ -259,32 +276,40 @@ class Visualisation(Char_set):
         line = line + '\n'
         return line
 
+    def create_vertice_set(self, vertices_adjacent: Vertice) -> Vertice_char:
+        """ 
+            return dict of {vertice: charactere}:
+            exemple {(0,0):┏}
+        """
+        vertices_char: Vertice_char = {}
+        for vertice in vertices_adjacent:
+            # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
+            charactere: str | None = self \
+                .get_vertice_char(vertices_adjacent.get(vertice))
+            if charactere is None:
+                raise Vertice_creation_error
+            vertices_char.update({vertice: charactere})
+        return vertices_char
+
     def display_maze(self) -> None:
         vertices_adjacent: Vertice = self.vertice_dict()
         vertices_char: Vertice_char = {}
         line: str = ""
         try:
-            for vertice in vertices_adjacent:
-                # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
-                charactere: str | None = self \
-                    .get_vertice_char(vertices_adjacent.get(vertice))
-                vertices_char.update({vertice: charactere})
-        except Vertice_creation_error as e:
-            raise Vertice_creation_error
-    
-        for i in range(self.__m_h + 1):
-            new_v: dict[Cell, str] = \
-                {k: vertices_char[k] for k in vertices_char if k[1] == i}
-            line = line + self.create_h_line(new_v)
-            for j in range(3):
-                line = line + self.create_v_line(new_v)
+            vertices_char = self.create_vertice_set(vertices_adjacent)
+            for i in range(self.__m_h + 1):
+                new_v: dict[Cell, str] = \
+                    {k: vertices_char[k] for k in vertices_char if k[1] == i}
+                try:
+                    line = line + self.create_h_line(new_v)
+                    for j in range(3):
+                        line = line + self.create_v_line(new_v)
+                except Vertice_creation_error:
+                    raise Display_creation_error
+
+        except Vertice_creation_error:
+            raise Display_creation_error
         print(line)
-
-    def set_bg_color(self, color: str) -> None:
-        self.__forty_two_color = color
-
-    def set_line_color(self, color: str) -> None:
-        self.__color = color
 
 
 def bytes_direction_activation(
@@ -341,7 +366,7 @@ def get_output(maze: MazeGrid) -> dict[Cell, int]:
     for cell in graph:
         open_neighbors: list[Cell] | None = graph.get(cell)
         if open_neighbors is None:
-            raise Output_creation_error("Output file creation error")
+            raise Output_creation_error
         key: Cell = cell
         value: int = bytes_direction_activation(key, open_neighbors)
         output.update({key: value})
@@ -358,13 +383,14 @@ def visualisation_maze(
 
     try:
         output: dict[Cell, int] = get_output(maze)
-    except Output_creation_error as e:
+        visualiser: Visualisation = Visualisation(
+            10, 10,
+            maze, output,
+            forty_two, line_color,
+            forty_two_color
+        )
+        visualiser.display_maze()
+    except (Output_creation_error, Display_creation_error) as e:
         print(e)
 
-    visualiser: Visualisation = Visualisation(
-        10, 10,
-        maze, output,
-        forty_two, line_color,
-        forty_two_color
-    )
-    visualiser.display_maze()
+    
