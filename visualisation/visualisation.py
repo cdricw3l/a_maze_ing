@@ -1,17 +1,16 @@
 from maze_generator.maze import MazeGrid, Cell
 from .color import Color_bg
 from collections import defaultdict
-from typing import List, Set, Type
+from typing import List, Set
 
-Vertice_adjacent = dict[tuple[int, int], list[tuple[int, ...]]]
-Vertice_char = dict[tuple[int, int], str]
-Vertice = dict[tuple[int, int], list[tuple[int, int]]]
+Vertex_char = dict[tuple[int, int], str]
+Vertex = dict[tuple[int, int], list[tuple[int, int]]]
 
 class Output_creation_error(Exception):
     def __init__(self) -> None:
         super().__init__("Output file creation error")
 
-class Vertice_creation_error(Exception):
+class Vertex_creation_error(Exception):
     def __init__(self) -> None:
         super().__init__("Error vertices contruction set")
 
@@ -83,14 +82,14 @@ class Visualisation(Char_set):
     def set_line_color(self, color: str) -> None:
         self.__color = color
 
-    def vertice_dict(self) -> Vertice:
+    def vertice_dict(self) -> Vertex:
         """
             create a dict of vertice (jonction point of the cell )
             and match the vertice point whith 2 oposed adjoining rooms
             (Nord-west/ Sud-east) see the read me.
             The number of vertice = maze_width + 1 * maze_height + 1
         """
-        vertice: Vertice = {}
+        vertice: Vertex = {}
         for x in range(self.__m_h + 1):
             for y in range(self.__m_w + 1):
                 cell: tuple[int, int] = (y, x)
@@ -143,7 +142,7 @@ class Visualisation(Char_set):
     def get_vertice_char(self, adjoining_rooms: List[tuple[int, int]] | None) -> str | None:
 
         if adjoining_rooms is None:
-            raise Vertice_creation_error("Error vertice contruction set")
+            raise Vertex_creation_error("Error vertice contruction set")
         v: str = ""
         w_cell: tuple[int, ...] = tuple(
             [adjoining_rooms[0][0],
@@ -175,69 +174,97 @@ class Visualisation(Char_set):
         v = v + west
         char : str = self.get_char(v)
         if char is None:
-            raise Vertice_creation_error("Error vertice contruction set")
+            raise Vertex_creation_error("Error vertice contruction set")
         return char
 
     def add_char(self, char: str, number: int, color: str) -> str:
-        if char is None:
-            return ""
         line: str = f"{color}"
         for i in range(number):
             line = line + char
         line = line + f"{self.__reset}"
         return line
 
-    def is_on_vertical_set(self, char: str | None) -> bool:
-        if self.get_char("NESW") == char:
+    def has_south_branch(self, vertex: str | None) -> bool:
+        """ 
+            Check if a vertex has a south branch.
+        """
+        if self.get_char("NESW") == vertex:
             return True
-        elif self.get_char("NES") == char:
+        elif self.get_char("NES") == vertex:
             return True
-        elif self.get_char("NSW") == char:
+        elif self.get_char("NSW") == vertex:
             return True
-        elif self.get_char("ESW") == char:
+        elif self.get_char("ESW") == vertex:
             return True
-        elif self.get_char("NS") == char:
+        elif self.get_char("NS") == vertex:
             return True
-        elif self.get_char("ES") == char:
+        elif self.get_char("ES") == vertex:
             return True
-        elif self.get_char("SW") == char:
+        elif self.get_char("SW") == vertex:
             return True
-        elif self.get_char("S") == char:
-            return True
-        return False
-
-    def is_on_horizontal_set(self, char: str | None) -> bool:
-        if self.get_char("NESW") == char:
-            return True
-        elif self.get_char("NES") == char:
-            return True
-        elif self.get_char("NEW") == char:
-            return True
-        elif self.get_char("ESW") == char:
-            return True
-        elif self.get_char("NE") == char:
-            return True
-        elif self.get_char("ES") == char:
-            return True
-        elif self.get_char("EW") == char:
-            return True
-        elif self.get_char("E") == char:
+        elif self.get_char("S") == vertex:
             return True
         return False
 
-    def create_h_line(self, vertices: dict[Cell, str]) -> str | None:
+    def has_east_branch(self, vertex: str | None) -> bool:
+        """ 
+            Check if a vertex has a east branch.
+        """
+        if self.get_char("NESW") == vertex:
+            return True
+        elif self.get_char("NES") == vertex:
+            return True
+        elif self.get_char("NEW") == vertex:
+            return True
+        elif self.get_char("ESW") == vertex:
+            return True
+        elif self.get_char("NE") == vertex:
+            return True
+        elif self.get_char("ES") == vertex:
+            return True
+        elif self.get_char("EW") == vertex:
+            return True
+        elif self.get_char("E") == vertex:
+            return True
+        return False
+
+    def create_vertex_set(self, vertices_adjacent: Vertex) -> Vertex_char:
+        """ 
+            return dict of {vertice: charactere}:
+            exemple {(0,0):┏}
+        """
+        vertices_char: Vertex_char = {}
+        for vertice in vertices_adjacent:
+            # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
+            charactere: str | None = self \
+                .get_vertice_char(vertices_adjacent.get(vertice))
+            if charactere is None:
+                raise Vertex_creation_error
+            vertices_char.update({vertice: charactere})
+        return vertices_char
+
+    def vertex_line(self, vertices: dict[Cell, str]) -> str:
+        """
+            vertice line creation create line
+            with vertices charactere and complement id needed
+        """
         line: str = ""
         for v in vertices:
+            # firt caractere of the vertice (0,0)
             line = line + f"{self.__color}{vertices.get(v)}{self.__reset}"
+            # complete line for vertice from (0,y) to vertice (self.__m_w - 1, y)
             if v[0] != self.__m_w:
-                if self.is_on_horizontal_set(vertices.get(v)):
+                # if vertice has east branch, add (cell with - 2) EW char
+                if self.has_east_branch(vertices.get(v)):
+                    
                     vertice_char: str | None = Char_set.get_char(self, "EW")
                     if vertice_char is None:
-                        raise Vertice_creation_error
+                        raise Vertex_creation_error
                     line = line + self.add_char(
                         vertice_char,
                         self.__c_w - 2,
                         self.__color)
+                # if vertice doest have east branch, add (cell with - 2) space char
                 else:
                     line = line + self.add_char(
                         " ",
@@ -246,17 +273,28 @@ class Visualisation(Char_set):
         line = line + '\n'
         return line
 
-    def create_v_line(self, vertices: dict[Cell, str]) -> str | None:
+    def inter_vertex_line(self, vertices: dict[Cell, str]) -> str | None:
         """ inter vertices creation line """
         line: str = ""
         for v in vertices:
-            if self.is_on_vertical_set(vertices.get(v)):
+            # check if the vertice has a south branch.
+            # if true add NS charactere
+            if self.has_south_branch(vertices.get(v)):
+                jonction: str | None = Char_set.get_char(self, 'dw')
+                if jonction is None:
+                    raise Vertex_creation_error 
                 line = line + \
                     f"{self.__color}" \
-                    f"{Char_set.get_char(self, 'NS')}" \
+                    f"{jonction}" \
                     f"{self.__reset}"
+            # if the vertice hasn't a south branch.
+            # add space charactere
             else:
                 line = line + " "
+            # complete line for vertice from (0,y) 
+            # to vertice (self.__m_w - 1, y)
+            # The color of the space depend of the cell type
+            # (entry, exit, 42, shortest path)
             if v[0] != self.__m_w:
                 # color the entry background
                 if v == self.__entry:
@@ -276,38 +314,21 @@ class Visualisation(Char_set):
         line = line + '\n'
         return line
 
-    def create_vertice_set(self, vertices_adjacent: Vertice) -> Vertice_char:
-        """ 
-            return dict of {vertice: charactere}:
-            exemple {(0,0):┏}
-        """
-        vertices_char: Vertice_char = {}
-        for vertice in vertices_adjacent:
-            # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
-            charactere: str | None = self \
-                .get_vertice_char(vertices_adjacent.get(vertice))
-            if charactere is None:
-                raise Vertice_creation_error
-            vertices_char.update({vertice: charactere})
-        return vertices_char
+
 
     def display_maze(self) -> None:
-        vertices_adjacent: Vertice = self.vertice_dict()
-        vertices_char: Vertice_char = {}
+        vertices_adjacent: Vertex = self.vertice_dict()
+        vertices_char: Vertex_char = {}
         line: str = ""
         try:
-            vertices_char = self.create_vertice_set(vertices_adjacent)
+            vertices_char = self.create_vertex_set(vertices_adjacent)
             for i in range(self.__m_h + 1):
                 new_v: dict[Cell, str] = \
                     {k: vertices_char[k] for k in vertices_char if k[1] == i}
-                try:
-                    line = line + self.create_h_line(new_v)
-                    for j in range(3):
-                        line = line + self.create_v_line(new_v)
-                except Vertice_creation_error:
-                    raise Display_creation_error
-
-        except Vertice_creation_error:
+                line = line + self.vertex_line(new_v)
+                for j in range(3):
+                    line = line + self.inter_vertex_line(new_v)
+        except Vertex_creation_error:
             raise Display_creation_error
         print(line)
 
@@ -352,14 +373,14 @@ def bytes_direction_activation(
 def get_output(maze: MazeGrid) -> dict[Cell, int]:
 
     """
-    return a dict with cell coordonee as key and
-    integer value who represente which wall is open
-    exemple: WSEN -> 0100:
-    West is open, south is closed, east is open and nord is open
-    exemple: WSEN -> 0000:
-    all the wall are open
-    exemple: WSEN -> 1111:
-    all the wall are closed
+        return a dict with cell coordonee as key and
+        integer value who represente which wall is open
+        exemple: WSEN -> 0100:
+        West is open, south is closed, east is open and nord is open
+        exemple: WSEN -> 0000:
+        all the wall are open
+        exemple: WSEN -> 1111:
+        all the wall are closed
     """
     graph: defaultdict[Cell, List[Cell]] = maze.graph
     output: dict[tuple[int, int], int] = {}
@@ -377,7 +398,7 @@ def visualisation_maze(
         maze: MazeGrid,
         line_color: str,
         forty_two_color: str
-        ) -> None:
+        ) -> bool:
 
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
 
@@ -390,7 +411,9 @@ def visualisation_maze(
             forty_two_color
         )
         visualiser.display_maze()
+        return True
     except (Output_creation_error, Display_creation_error) as e:
         print(e)
+        return False
 
     

@@ -73,9 +73,9 @@ def maze_menu(config_file: str) -> int:
     maze : MazeGrid = get_maze(config_file)
     color_l: str = Color_line.DEFAULT
     color_bg: str = Color_bg.DEFAULT
-    visualisation_maze(maze, color_l, color_bg)
+    state: bool = visualisation_maze(maze, color_l, color_bg)
     try:
-        while True:
+        while state:
             print("=== A-Maze-ing ===")
             print("1. Re-generate a new maze")
             print("2. Show/hide path from entry to exit")
@@ -86,19 +86,20 @@ def maze_menu(config_file: str) -> int:
             match user_input:
                 case "1":
                     maze : MazeGrid = get_maze(config_file)
-                    visualisation_maze(maze, color_l, color_bg)
+                    state = visualisation_maze(maze, color_l, color_bg)
                 case "2":
-                    visualisation_maze(maze, Color_line.DEFAULT, Color_bg.DEFAULT)
+                    state = visualisation_maze(maze, Color_line.DEFAULT, Color_bg.DEFAULT)
                 case "3":
                     color_l: str = color_line()
-                    visualisation_maze(maze, color_l, color_bg)
+                    state = visualisation_maze(maze, color_l, color_bg)
                 case "4":
                     color_bg: str = forty_two_colors()
-                    visualisation_maze(maze, color_l, color_bg)
+                    state = visualisation_maze(maze, color_l, color_bg)
                 case "5":
                     return 0
                 case _:
                     print("Choose a valide input between 1-4 or quit with 5")
                     continue
+                
     except (Exception, KeyboardInterrupt):
         return 0
