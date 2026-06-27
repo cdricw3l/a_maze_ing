@@ -53,7 +53,7 @@ class Visualisation(Char_set):
     __forty_two_color: str
     __path_color: str
     __reset: str
-
+    __path_state: bool
     def __init__(
             self,
             c_h: int,
@@ -64,7 +64,8 @@ class Visualisation(Char_set):
             forty_two: Set[Cell],
             color_line: str ,
             forty_two_color: str,
-            shortest_path_color: str
+            shortest_path_color: str,
+            path_state: bool
             ) -> None:
         super().__init__()
         self.__c_h = c_h
@@ -79,6 +80,7 @@ class Visualisation(Char_set):
         self.__color = color_line
         self.__forty_two_color = forty_two_color
         self.__path_color = shortest_path_color
+        self.__path_state = path_state
         self.__reset = "\033[0m"
 
     def set_bg_color(self, color: str) -> None:
@@ -311,7 +313,7 @@ class Visualisation(Char_set):
                 elif v in self.__forty_two:
                     line = line + self \
                         .add_char(" ", self.__c_w - 2, self.__forty_two_color)
-                elif v in self.__shortest_path:
+                elif v in self.__shortest_path and self.__path_state is True:
                     line = line + self \
                         .add_char(" ", self.__c_w - 2, self.__path_color)
                 else:
@@ -341,7 +343,8 @@ def visualisation_maze(
         maze: MazeGrid,
         line_color: str,
         forty_two_color: str,
-        shortest_path_color: str
+        shortest_path_color: str,
+        path_state: bool
         ) -> bool:
 
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
@@ -356,7 +359,7 @@ def visualisation_maze(
             10, 10,
             maze, maze_structure, output.get_shortest_path(),
             forty_two, line_color,
-            forty_two_color, shortest_path_color
+            forty_two_color, shortest_path_color, path_state
         )
         visualiser.display_maze()
         output.write_output_file(maze.height)
