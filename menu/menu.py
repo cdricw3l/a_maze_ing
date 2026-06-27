@@ -1,7 +1,7 @@
 from visualisation.color import Color_bg, Color_line
 from maze_generator.maze import MazeGrid, get_maze
 from visualisation.visualisation import visualisation_maze
-
+import time
 
 def color_line() -> str:
     print(f"=== 42 maze colors === (white by default)\n\
@@ -103,7 +103,8 @@ def maze_menu(config_file: str) -> int:
                 case "5":
                     return 0
                 case _:
-                    print("Choose a valide input between 1-4 or quit with 5")
+                    print(f"{Color_line.RED}Choose a valide input between 1-4 or quit with 5{Color_line.RESET}")
+                    time.sleep(0.5)
                     continue
     except (Exception, KeyboardInterrupt):
         return 0
