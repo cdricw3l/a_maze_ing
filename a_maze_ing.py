@@ -1,5 +1,5 @@
 
-from menu import maze_menu, Color_line
+from menu.menu import maze_menu, Color_line
 import sys
 
 if __name__ == "__main__":

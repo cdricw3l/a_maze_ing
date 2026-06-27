@@ -2,6 +2,7 @@ from visualisation.color import Color_bg, Color_line
 from maze_generator.maze import MazeGrid, get_maze
 from visualisation.visualisation import visualisation_maze
 
+
 def color_line() -> str:
     print(f"=== 42 maze colors === (white by default)\n\
 1:{Color_line.BLACK}Black{Color_line.RESET}\n\
@@ -33,6 +34,7 @@ def color_line() -> str:
         case _:
             print("color by default: white")
             return Color_line.WHITE
+
 
 def forty_two_colors() -> str:
     print(f"=== 42 background colors === (white by default)\n\
@@ -68,9 +70,10 @@ def forty_two_colors() -> str:
         case _:
             print("color by default: white")
             return Color_bg.WHITE
-        
+
+
 def maze_menu(config_file: str) -> int:
-    maze : MazeGrid = get_maze(config_file)
+    maze: MazeGrid = get_maze(config_file)
     color_l: str = Color_line.DEFAULT
     color_bg: str = Color_bg.DEFAULT
     state: bool = visualisation_maze(maze, color_l, color_bg)
@@ -85,21 +88,23 @@ def maze_menu(config_file: str) -> int:
             user_input = input("Choice? (1-5): ")
             match user_input:
                 case "1":
-                    maze : MazeGrid = get_maze(config_file)
+                    maze = get_maze(config_file)
                     state = visualisation_maze(maze, color_l, color_bg)
                 case "2":
-                    state = visualisation_maze(maze, Color_line.DEFAULT, Color_bg.DEFAULT)
+                    state = visualisation_maze(maze,
+                                               Color_line.DEFAULT,
+                                               Color_bg.DEFAULT)
                 case "3":
-                    color_l: str = color_line()
+                    color_l = color_line()
                     state = visualisation_maze(maze, color_l, color_bg)
                 case "4":
-                    color_bg: str = forty_two_colors()
+                    color_bg = forty_two_colors()
                     state = visualisation_maze(maze, color_l, color_bg)
                 case "5":
                     return 0
                 case _:
                     print("Choose a valide input between 1-4 or quit with 5")
                     continue
-                
     except (Exception, KeyboardInterrupt):
         return 0
+    return 1
