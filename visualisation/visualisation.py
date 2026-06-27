@@ -7,6 +7,13 @@ Vertice_adjacent = dict[tuple[int, int], list[tuple[int, ...]]]
 Vertice_char = dict[tuple[int, int], str]
 Vertice = dict[tuple[int, int], list[tuple[int, int]]]
 
+class Output_creation_error(Exception):
+    def __init__(self, *args) -> None:
+        super().__init__(*args)
+
+class Vertice_creation_error(Exception):
+    def __init__(self, *args) -> None:
+        super().__init__(*args)
 
 class Char_set:
 
@@ -20,9 +27,7 @@ class Char_set:
             "EW": '━', "SW": '┓', "N": '╹',
             "E": '╺', "S": '╻', "W": '╸'}
 
-    def get_char(self, code: str) -> str:
-        if code is None:
-            return ""
+    def get_char(self, code: str) -> str | None:
         return self.__char_set.get(code)
 
 
@@ -40,7 +45,7 @@ class Visualisation(Char_set):
     __m_w: int
     __entry: tuple[int, int]
     __exit: tuple[int, int]
-    __struct: dict[tuple[float, ...], int]
+    __struct: dict[Cell, int]
     __color: str
     __forty_two_color: str
     __reset: str
@@ -50,7 +55,7 @@ class Visualisation(Char_set):
             c_h: int,
             c_w: int,
             maze: MazeGrid,
-            maze_structure: dict[tuple[float, ...], int],
+            maze_structure: dict[Cell, int],
             forty_two: Set[Cell],
             color: str = "\033[0m",
             forty_two_color: str = "\033[45m"
@@ -125,8 +130,10 @@ class Visualisation(Char_set):
                 return "N"
         return ""
 
-    def get_vertice_char(self, adjoining_rooms: List[tuple[int, int]]) -> str:
+    def get_vertice_char(self, adjoining_rooms: List[tuple[int, int]] | None) -> str | None:
 
+        if adjoining_rooms is None:
+            raise Vertice_creation_error("Error vertice contruction set")
         v: str = ""
         w_cell: tuple[int, ...] = tuple(
             [adjoining_rooms[0][0],
@@ -156,9 +163,12 @@ class Visualisation(Char_set):
         v = v + south
         west: str = self.check_if_open(adjoining_rooms[0], w_cell, "W")
         v = v + west
-        return self.get_char(v)
+        char : str = self.get_char(v)
+        if char is None:
+            raise Vertice_creation_error("Error vertice contruction set")
+        return char
 
-    def add_char(self, char: str | None, number: int, color: str) -> str:
+    def add_char(self, char: str, number: int, color: str) -> str:
         if char is None:
             return ""
         line: str = f"{color}"
@@ -205,7 +215,7 @@ class Visualisation(Char_set):
             return True
         return False
 
-    def create_h_line(self, vertices: dict[tuple[int, ...], str]) -> None:
+    def create_h_line(self, vertices: dict[Cell, str]) -> str | None:
         line: str = ""
         for v in vertices:
             line = line + f"{self.__color}{vertices.get(v)}{self.__reset}"
@@ -220,9 +230,10 @@ class Visualisation(Char_set):
                         " ",
                         self.__c_w - 2,
                         self.__color)
-        print(line)
+        line = line + '\n'
+        return line
 
-    def create_v_line(self, vertices: dict[tuple[int, ...], str]) -> None:
+    def create_v_line(self, vertices: dict[Cell, str]) -> str | None:
         line: str = ""
         for v in vertices:
             if self.is_on_vertical_set(vertices.get(v)):
@@ -245,23 +256,29 @@ class Visualisation(Char_set):
                 else:
                     line = line + self \
                         .add_char(" ", self.__c_w - 2, Color_bg.TRANSPARANT)
-        print(line)
+        line = line + '\n'
+        return line
 
     def display_maze(self) -> None:
         vertices_adjacent: Vertice = self.vertice_dict()
         vertices_char: Vertice_char = {}
-        for vertice in vertices_adjacent:
-            # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
-            charactere: str = self \
-                .get_vertice_char(vertices_adjacent.get(vertice))
-            vertices_char.update({vertice: charactere})
-
+        line: str = ""
+        try:
+            for vertice in vertices_adjacent:
+                # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
+                charactere: str | None = self \
+                    .get_vertice_char(vertices_adjacent.get(vertice))
+                vertices_char.update({vertice: charactere})
+        except Vertice_creation_error as e:
+            raise Vertice_creation_error
+    
         for i in range(self.__m_h + 1):
-            new_v: dict[tuple[int, int], str] = \
+            new_v: dict[Cell, str] = \
                 {k: vertices_char[k] for k in vertices_char if k[1] == i}
-            self.create_h_line(new_v)
+            line = line + self.create_h_line(new_v)
             for j in range(3):
-                self.create_v_line(new_v)
+                line = line + self.create_v_line(new_v)
+        print(line)
 
     def set_bg_color(self, color: str) -> None:
         self.__forty_two_color = color
@@ -307,7 +324,7 @@ def bytes_direction_activation(
     return value
 
 
-def get_output(maze: MazeGrid) -> dict[tuple[float,  float]: int]:
+def get_output(maze: MazeGrid) -> dict[Cell, int]:
 
     """
     return a dict with cell coordonee as key and
@@ -320,10 +337,12 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,  float]: int]:
     all the wall are closed
     """
     graph: defaultdict[Cell, List[Cell]] = maze.graph
-    output: dict[tuple[float, ...]: int] = {}
+    output: dict[tuple[int, int], int] = {}
     for cell in graph:
-        open_neighbors: list[Cell] = graph.get(cell)
-        key: tuple[float, ...] = cell
+        open_neighbors: list[Cell] | None = graph.get(cell)
+        if open_neighbors is None:
+            raise Output_creation_error("Output file creation error")
+        key: Cell = cell
         value: int = bytes_direction_activation(key, open_neighbors)
         output.update({key: value})
     return output
@@ -331,12 +350,17 @@ def get_output(maze: MazeGrid) -> dict[tuple[float,  float]: int]:
 
 def visualisation_maze(
         maze: MazeGrid,
-        line_color,
-        forty_two_color: str = "\033[45m"
+        line_color: str,
+        forty_two_color: str
         ) -> None:
 
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
-    output: dict[tuple[float, float]: int] = get_output(maze)
+
+    try:
+        output: dict[Cell, int] = get_output(maze)
+    except Output_creation_error as e:
+        print(e)
+
     visualiser: Visualisation = Visualisation(
         10, 10,
         maze, output,
