@@ -62,7 +62,7 @@ def forty_two_colors() -> str:
         case "7":
             return Color_bg.PURPLE
         case "8":
-            return Color_bg.PURPLE
+            return Color_bg.CYAN
         case "9":
             return Color_bg.WHITE
         case _:

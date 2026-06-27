@@ -1,14 +1,12 @@
 from maze_generator.maze import MazeGrid, Cell
 from .color import Color_bg
+from .output_generation import Output_creation_error, Output
 from collections import defaultdict
 from typing import List, Set
 
 Vertex_char = dict[tuple[int, int], str]
 Vertex = dict[tuple[int, int], list[tuple[int, int]]]
 
-class Output_creation_error(Exception):
-    def __init__(self) -> None:
-        super().__init__("Output file creation error")
 
 class Vertex_creation_error(Exception):
     def __init__(self) -> None:
@@ -280,7 +278,7 @@ class Visualisation(Char_set):
             # check if the vertice has a south branch.
             # if true add NS charactere
             if self.has_south_branch(vertices.get(v)):
-                jonction: str | None = Char_set.get_char(self, 'dw')
+                jonction: str | None = Char_set.get_char(self, 'NS')
                 if jonction is None:
                     raise Vertex_creation_error 
                 line = line + \
@@ -403,7 +401,7 @@ def visualisation_maze(
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
 
     try:
-        output: dict[Cell, int] = get_output(maze)
+        output: dict[Cell, int] = Output(maze.graph).get_maze_structure()
         visualiser: Visualisation = Visualisation(
             10, 10,
             maze, output,
