@@ -165,8 +165,7 @@ class Output:
                     f.write("".join(row))
                 f.write(f"\n{self.__entry[0], self.__entry[1]}\n")
                 f.write(f"{self.__exit[0], self.__exit[1]}\n")
-                f.write(f"{"".join(
-                    [self.get_shortest_path()
-                     [k] for k in self.get_shortest_path()])}\n")
+                path: str = "".join([self.get_shortest_path()[k] for k in self.get_shortest_path()])
+                f.write(f"{path}\n")
         except Exception as e:
             raise Output_creation_error(f"Output file creation error: {e}")
