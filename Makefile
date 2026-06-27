@@ -1,5 +1,6 @@
 NAME=a_maze_ing.py
 FLAKE=flake8
+PDB=-m pdb 
 MYPY=mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 MYPY_STRICT= mypy . --warn-return-any
 VENV=venv
@@ -10,6 +11,8 @@ venv:
 run:
 	@python3 $(NAME) $(CONFIG)
 
+debug:
+	@python3 $(PDB)  $(NAME) $(CONFIG)
 lt: 
 	@$(MYPY)
 
