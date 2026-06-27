@@ -1,5 +1,0 @@
-# Project tooling requirements extracted from en.subject.pdf
-# Python 3.10+ is required by the project instructions.
-flake8
-mypy
-pytest
