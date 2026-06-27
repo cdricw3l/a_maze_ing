@@ -54,15 +54,16 @@ class Visualisation(Char_set):
     __path_color: str
     __reset: str
     __path_state: bool
+
     def __init__(
             self,
             c_h: int,
             c_w: int,
             maze: MazeGrid,
             maze_structure: dict[Cell, int],
-            shortest_path: dict[Cell, int],
+            shortest_path: dict[Cell, str],
             forty_two: Set[Cell],
-            color_line: str ,
+            color_line: str,
             forty_two_color: str,
             shortest_path_color: str,
             path_state: bool
@@ -353,8 +354,6 @@ def visualisation_maze(
         maze_structure: dict[Cell, int] = output.get_maze_structure()
         # print(f"start {maze.entry, maze.graph.get(maze.entry)}")
         output.shortest_path_generation()
-
-        print(f"path:{"".join([output.get_shortest_path()[k] for k in output.get_shortest_path()])}")
         visualiser: Visualisation = Visualisation(
             10, 10,
             maze, maze_structure, output.get_shortest_path(),

@@ -26,7 +26,7 @@ class Output:
         self.__shortest_path = {}
 
     def set_shortest_path(self, path: dict[Cell, str]) -> None:
-        self.__shortest_path = {k:path[k] for k in path}
+        self.__shortest_path = {k: path[k] for k in path}
 
     def get_shortest_path(self) -> dict[Cell, str]:
         return self.__shortest_path
@@ -111,10 +111,8 @@ class Output:
         if neighbour is not None and len(neighbour) == 0:
             return False
         if current == self.__exit:
-            
             self.set_shortest_path(path)
             return True
-
         visited.append(current)
         if neighbour is not None:
             for cell in neighbour:
@@ -167,6 +165,8 @@ class Output:
                     f.write("".join(row))
                 f.write(f"\n{self.__entry[0], self.__entry[1]}\n")
                 f.write(f"{self.__exit[0], self.__exit[1]}\n")
-                f.write(f"{self.get_shortest_path()}")
+                f.write(f"{"".join(
+                    [self.get_shortest_path()
+                     [k] for k in self.get_shortest_path()])}\n")
         except Exception as e:
             raise Output_creation_error(f"Output file creation error: {e}")
