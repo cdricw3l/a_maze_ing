@@ -117,7 +117,6 @@ def validate_entry(
     if value is None:
         raise ConfigError("ENTRY is required")
     x, y = _parse_coord(value)
-    print(x, y)
     if not (0 <= x < width and 0 <= y < height):
         msg = (f"ENTRY ({x}, {y}) out of bounds "
                f"for width={width}, height={height}")

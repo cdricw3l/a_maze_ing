@@ -397,22 +397,20 @@ def visualisation_maze(
         ) -> bool:
 
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
-
     try:
         output: Output = Output(maze.graph, maze.entry, maze.exit)
         maze_structure: dict[Cell, int] = output.get_maze_structure()
-        print(f"start {maze.entry, maze.graph.get(maze.entry)}")
-        visited: list = []
-        output.shortest_path(maze.entry, maze.graph.get(maze.entry), visited , "")
-
-        print(f"path:{output.get_shortest_path()}")
+        # print(f"start {maze.entry, maze.graph.get(maze.entry)}")
+        output.shortest_path()
+        output.write_output_file(maze.height)
+        # print(f"path:{output.get_shortest_path()}")
         visualiser: Visualisation = Visualisation(
             10, 10,
             maze, maze_structure,
             forty_two, line_color,
             forty_two_color
         )
-        visualiser.display_maze()
+        #visualiser.display_maze()
         return True
     except (Output_creation_error, Display_creation_error) as e:
         print(e)
