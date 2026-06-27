@@ -1,4 +1,7 @@
-from maze_generator.maze import MazeGrid, Cell, defaultdict, List
+from maze_generator.maze import Cell
+from typing import List
+from collections import defaultdict
+
 
 class Output_creation_error(Exception):
     def __init__(self) -> None:
@@ -9,16 +12,15 @@ class Output:
 
     __graph: defaultdict[Cell, List[Cell]]
 
-    def __init__(self, graph: defaultdict[Cell, List[Cell]]):
+    def __init__(self, graph: defaultdict[Cell, List[Cell]]) -> None:
         if graph is None:
             raise Output_creation_error
         self.__graph = graph
 
-
     def bytes_direction_activation(self,
-        cell: tuple[float, float],
-        open_neighbors: List[Cell]
-        ) -> int:
+                                   cell: tuple[float, float],
+                                   open_neighbors: List[Cell]
+                                   ) -> int:
 
         west: tuple[float, float] = (cell[0] - 1, cell[1])
         sud: tuple[float, float] = (cell[0], cell[1] + 1)

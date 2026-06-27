@@ -4,17 +4,19 @@ from .output_generation import Output_creation_error, Output
 from collections import defaultdict
 from typing import List, Set
 
-Vertex_char = dict[tuple[int, int], str]
-Vertex = dict[tuple[int, int], list[tuple[int, int]]]
+Vertex_char = dict[Cell, str]
+Vertex = dict[Cell, list[Cell]]
 
 
 class Vertex_creation_error(Exception):
     def __init__(self) -> None:
         super().__init__("Error vertices contruction set")
 
+
 class Display_creation_error(Exception):
     def __init__(self) -> None:
         super().__init__("Display creation error")
+
 
 class Char_set:
 
@@ -97,8 +99,8 @@ class Visualisation(Char_set):
         return vertice
 
     def check_if_open(self,
-                      adjoining_rooms: tuple[int, ...],
-                      adjacent_cell: tuple[int, ...],
+                      adjoining_rooms: Cell,
+                      adjacent_cell: Cell,
                       direction: str) -> str:
         room_bit: int | None = self.__struct.get(adjoining_rooms)
         adjacent_cell_bit: int | None = self.__struct.get(adjacent_cell)
@@ -137,23 +139,20 @@ class Visualisation(Char_set):
                 return "N"
         return ""
 
-    def get_vertice_char(self, adjoining_rooms: List[tuple[int, int]] | None) -> str | None:
+    def get_vertice_char(self,
+                         adjoining_rooms: List[Cell] | None) -> str | None:
 
         if adjoining_rooms is None:
-            raise Vertex_creation_error("Error vertice contruction set")
+            raise Vertex_creation_error
         v: str = ""
-        w_cell: tuple[int, ...] = tuple(
-            [adjoining_rooms[0][0],
-             adjoining_rooms[0][1] + 1])
-        n_cell: tuple[int, ...] = tuple(
-            [adjoining_rooms[0][0] + 1,
-             adjoining_rooms[0][1]])
-        e_cell: tuple[int, ...] = tuple(
-            [adjoining_rooms[1][0],
-             adjoining_rooms[1][1] - 1])
-        s_cell: tuple[int, ...] = tuple(
-            [adjoining_rooms[1][0] - 1,
-             adjoining_rooms[1][1]])
+        w_cell: Cell = (adjoining_rooms[0][0],
+                        adjoining_rooms[0][1] + 1)
+        n_cell: Cell = (adjoining_rooms[0][0] + 1,
+                        adjoining_rooms[0][1])
+        e_cell: Cell = (adjoining_rooms[1][0],
+                        adjoining_rooms[1][1] - 1)
+        s_cell: Cell = (adjoining_rooms[1][0] - 1,
+                        adjoining_rooms[1][1])
 
         # print(f"adjoining root: {adjoining_rooms}")
         # print(f"vertice: {vertice}, "
@@ -170,9 +169,9 @@ class Visualisation(Char_set):
         v = v + south
         west: str = self.check_if_open(adjoining_rooms[0], w_cell, "W")
         v = v + west
-        char : str = self.get_char(v)
+        char: str | None = self.get_char(v)
         if char is None:
-            raise Vertex_creation_error("Error vertice contruction set")
+            raise Vertex_creation_error
         return char
 
     def add_char(self, char: str, number: int, color: str) -> str:
@@ -183,7 +182,7 @@ class Visualisation(Char_set):
         return line
 
     def has_south_branch(self, vertex: str | None) -> bool:
-        """ 
+        """
             Check if a vertex has a south branch.
         """
         if self.get_char("NESW") == vertex:
@@ -205,7 +204,7 @@ class Visualisation(Char_set):
         return False
 
     def has_east_branch(self, vertex: str | None) -> bool:
-        """ 
+        """
             Check if a vertex has a east branch.
         """
         if self.get_char("NESW") == vertex:
@@ -227,7 +226,7 @@ class Visualisation(Char_set):
         return False
 
     def create_vertex_set(self, vertices_adjacent: Vertex) -> Vertex_char:
-        """ 
+        """
             return dict of {vertice: charactere}:
             exemple {(0,0):┏}
         """
@@ -250,11 +249,11 @@ class Visualisation(Char_set):
         for v in vertices:
             # firt caractere of the vertice (0,0)
             line = line + f"{self.__color}{vertices.get(v)}{self.__reset}"
-            # complete line for vertice from (0,y) to vertice (self.__m_w - 1, y)
+            # complete line for vertice
+            # from (0,y) to vertice (self.__m_w - 1, y)
             if v[0] != self.__m_w:
                 # if vertice has east branch, add (cell with - 2) EW char
                 if self.has_east_branch(vertices.get(v)):
-                    
                     vertice_char: str | None = Char_set.get_char(self, "EW")
                     if vertice_char is None:
                         raise Vertex_creation_error
@@ -262,7 +261,8 @@ class Visualisation(Char_set):
                         vertice_char,
                         self.__c_w - 2,
                         self.__color)
-                # if vertice doest have east branch, add (cell with - 2) space char
+                # if vertice doest have east branch,
+                # add (cell with - 2) space char
                 else:
                     line = line + self.add_char(
                         " ",
@@ -271,7 +271,7 @@ class Visualisation(Char_set):
         line = line + '\n'
         return line
 
-    def inter_vertex_line(self, vertices: dict[Cell, str]) -> str | None:
+    def inter_vertex_line(self, vertices: dict[Cell, str]) -> str:
         """ inter vertices creation line """
         line: str = ""
         for v in vertices:
@@ -280,7 +280,7 @@ class Visualisation(Char_set):
             if self.has_south_branch(vertices.get(v)):
                 jonction: str | None = Char_set.get_char(self, 'NS')
                 if jonction is None:
-                    raise Vertex_creation_error 
+                    raise Vertex_creation_error
                 line = line + \
                     f"{self.__color}" \
                     f"{jonction}" \
@@ -289,7 +289,7 @@ class Visualisation(Char_set):
             # add space charactere
             else:
                 line = line + " "
-            # complete line for vertice from (0,y) 
+            # complete line for vertice from (0,y)
             # to vertice (self.__m_w - 1, y)
             # The color of the space depend of the cell type
             # (entry, exit, 42, shortest path)
@@ -311,8 +311,6 @@ class Visualisation(Char_set):
                         .add_char(" ", self.__c_w - 2, Color_bg.TRANSPARANT)
         line = line + '\n'
         return line
-
-
 
     def display_maze(self) -> None:
         vertices_adjacent: Vertex = self.vertice_dict()
@@ -413,5 +411,3 @@ def visualisation_maze(
     except (Output_creation_error, Display_creation_error) as e:
         print(e)
         return False
-
-    

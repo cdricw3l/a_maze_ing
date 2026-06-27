@@ -18,7 +18,7 @@ class MazeGrid:
     validated by the caller.
     """
 
-    def __init__(self, width: int, height: int, entry: int, exit: int) -> None:
+    def __init__(self, width: int, height: int, entry: Cell, exit: Cell) -> None:
         self.width = width
         self.height = height
         self.entry = entry
@@ -187,5 +187,5 @@ def get_maze(config_file: str) -> MazeGrid:
     maze: MazeGrid = run_algorithm(config)
     return maze
 
-if __name__ == '__main__':
-    get_maze()
+# if __name__ == '__main__':
+#     get_maze()
