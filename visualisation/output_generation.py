@@ -111,6 +111,7 @@ class Output:
         if neighbour is not None and len(neighbour) == 0:
             return False
         if current == self.__exit:
+            print(f"chemin trouver: {path}")
             self.set_shortest_path(path)
             return True
         visited.append(current)
