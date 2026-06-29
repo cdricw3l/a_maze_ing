@@ -6,7 +6,7 @@ import sys
 
 Cell = Tuple[int, int]
 Graph = DefaultDict[Cell, List[Cell]]
-
+IMPERFECT: float = 1
 
 class MazeValidationError(ValueError):
     """Raised when a maze graph structure is invalid."""
@@ -150,7 +150,8 @@ class MazeGrid:
             if num_to_remove == 0:
                 num_to_remove = 1
             for a, b in random.sample(walls, min(num_to_remove, len(walls))):
-                # edit: befors open the wall check if the Cell are in the 42 scope
+                # edit: befors open the wall
+                # check if the Cell are in the 42 scope
                 forty_two_set: Set[Cell] = self.forty_two_logo(self.width, self.height)
                 if a not in forty_two_set and b not in forty_two_set:
                     self.carve_passage(a, b)
@@ -182,7 +183,7 @@ def run_algorithm(config: Config) -> MazeGrid:
         stack.append(neighbor)
 
     if config.perfect is False:
-        maze.make_imperfect(0.5)
+        maze.make_imperfect(IMPERFECT)
     return maze
 
 

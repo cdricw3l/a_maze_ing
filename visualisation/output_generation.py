@@ -1,6 +1,6 @@
 from maze_generator.maze import Cell, Graph
 from typing import List
-
+import sys
 
 class Output_creation_error(Exception):
     def __init__(self, msg: str) -> None:
@@ -24,13 +24,19 @@ class Output:
         self.__exit = exit
         self.__maze_structure = self.get_maze_structure()
         self.__shortest_path = {}
+        sys.setrecursionlimit(1500)
 
     def set_shortest_path(self, path: dict[Cell, str]) -> None:
         self.__shortest_path = {k: path[k] for k in path}
 
     def get_shortest_path(self) -> dict[Cell, str]:
         return self.__shortest_path
-
+    
+    @staticmethod
+    def get_len_path(path: dict[Cell, str]) -> int:
+        i: int = len({i for i in path})
+        return i
+    
     def _bytes_direction_activation(self,
                                     cell: tuple[float, float],
                                     open_neighbors: List[Cell]
@@ -66,6 +72,34 @@ class Output:
             value = value | (1 << 0)
 
         return value
+    
+    def get_direction(self, current: Cell, neighbour: Cell) -> str:
+        """ This fonction  return the cardinal direction between current and neigbour"""
+        if neighbour[0] == current[0] and neighbour[1] == current[1] - 1:
+            return "N"
+        if neighbour[0] == current[0] and neighbour[1] == current[1] + 1:
+            return "S"
+        if neighbour[0] == current[0] + 1 and neighbour[1] == current[1]:
+            return "E"
+        if neighbour[0] == current[0] - 1 and neighbour[1] == current[1]:
+            return "W"
+        return ""
+
+    def is_valide_move(self, current: Cell, neigbour: Cell, maze_structure: dict[Cell, int]) -> bool:
+        """ This fonction check if the wall between two cell is open """
+        # get the direction fron current to neigbour (WSEN)
+        direction: str = self.get_direction(current, neigbour)
+        # get the (WSEN) stucture of the cell
+        wall: int = maze_structure.get(current)
+        if direction == "W" and ((wall >> 3) & 1) == 0:
+            return True
+        if direction == "S" and ((wall >> 2) & 1) == 0:
+            return True
+        if direction == "E" and ((wall >> 1) & 1) == 0:
+            return True
+        if direction == "N" and ((wall >> 0) & 1) == 0:
+            return True
+        return False
 
     def get_maze_structure(self) -> dict[Cell, int]:
 
@@ -90,65 +124,62 @@ class Output:
             output.update({key: value})
         return output
 
-    def get_direction(self, current: Cell, neighbour: Cell) -> str:
-
-        if neighbour[0] == current[0] and neighbour[1] == current[1] - 1:
-            return "N"
-        if neighbour[0] == current[0] and neighbour[1] == current[1] + 1:
-            return "S"
-        if neighbour[0] == current[0] + 1 and neighbour[1] == current[1]:
-            return "E"
-        if neighbour[0] == current[0] - 1 and neighbour[1] == current[1]:
-            return "W"
-        return ""
+    
 
     def _shortest_path_algo(self,
                             current: Cell,
                             neighbour: list[Cell] | None,
                             visited: list[Cell],
                             path: dict[Cell, str]) -> bool:
-
+        
         if neighbour is not None and len(neighbour) == 0:
             return False
+    
         if current == self.__exit:
-            print(f"chemin trouver: {path}")
-            self.set_shortest_path(path)
-            return True
+            if self.get_len_path(self.__shortest_path) == 0 or self.get_len_path(path) < self.get_len_path(self.__shortest_path):
+                print(f"path update new: {self.get_len_path(path)} old: {self.get_len_path(self.__shortest_path)}")
+                self.set_shortest_path(path)
+            return False
         visited.append(current)
-        if neighbour is not None:
-            for cell in neighbour:
-                if cell not in visited:
+        for cell in neighbour:
+            if cell not in visited:
 
-                    direction = self.get_direction(current, cell)
-                    # print(f"string {string}")
-                    path.update({cell: direction})
-                    new_neighbour: list[Cell] | None = self.__graph.get(cell)
-                    if new_neighbour is None:
-                        return False
-                    self._shortest_path_algo(cell,
-                                             new_neighbour,
-                                             visited,
-                                             path)
-                    # print(f"delete char {string}")
-                    path.popitem()
+                direction = self.get_direction(current, cell)
+                # print(f"string {string}")
+                path.update({cell: direction})
+                new_neighbour: list[Cell] | None = self.__graph.get(cell)
+                if new_neighbour is None:
+                    return False
+                self._shortest_path_algo(cell,
+                                            new_neighbour,
+                                            visited,
+                                            path)
+                # print(f"delete char {string}")
+                path.popitem()
+                #visited.pop()
+                #print(f"visited: {visited}")
         return True
 
-    def shortest_path_generation(self) -> bool:
+    def shortest_path_generation(self, map_height: int, map_width: int) -> bool:
         current = self.__entry
         visited: list[Cell] = []
         neighbour: list[Cell] | None = self.__graph.get(current)
         path: dict[Cell, str] = {}
-
+        
+        if map_height > 40 and map_width > 40:
+            sys.setrecursionlimit(sys.getrecursionlimit() + 500)
         if neighbour is None:
             raise Output_creation_error(
                 f"Output file creation error: "
                 f"cant't found neighbour of the cell: {current}")
         try:
             self._shortest_path_algo(current, neighbour, visited, path)
-        except RecursionError:
-            raise Output_creation_error(
-                "Output file creation error: "
-                "map to big for find the shortest_path")
+        except (RecursionError) as e:
+            print(f"{e}")
+            # if an Recurtion error occure, setrecursionlimit is increase
+            # and the fonction return false. The fonction is recall until she return true.
+            sys.setrecursionlimit(sys.getrecursionlimit() + 500)
+            return False
         return True
 
     def write_output_file(self, maze_height: int) -> None:
@@ -172,3 +203,6 @@ class Output:
                 f.write(f"{path}\n")
         except Exception as e:
             raise Output_creation_error(f"Output file creation error: {e}")
+
+if __name__ == "main":
+    print(0 >> 0 & 1)

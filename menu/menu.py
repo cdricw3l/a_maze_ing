@@ -2,7 +2,7 @@ from visualisation.color import Color_bg, Color_line
 from maze_generator.maze import MazeGrid, get_maze
 from visualisation.visualisation import visualisation_maze
 import time
-
+import sys
 
 def color_line() -> str:
     print(f"=== 42 maze colors === (white by default)\n\

@@ -1,7 +1,8 @@
-from maze_generator.maze import MazeGrid, Cell
+from maze_generator.maze import MazeGrid, Cell, Graph
 from .color import Color_bg
 from .output_generation import Output_creation_error, Output
 from typing import List, Set
+import sys
 
 Vertex_char = dict[Cell, str]
 Vertex = dict[Cell, list[Cell]]
@@ -333,12 +334,15 @@ class Visualisation(Char_set):
                 new_v: dict[Cell, str] = \
                     {k: vertices_char[k] for k in vertices_char if k[1] == i}
                 line = line + self.vertex_line(new_v)
-                for j in range(3):
-                    line = line + self.inter_vertex_line(new_v)
+                #for j in range():
+                line = line + self.inter_vertex_line(new_v)
         except Vertex_creation_error as e:
             raise Display_creation_error(f"Vertex creation error: {e}")
         print(line)
 
+
+def graph_helper_neigbour(graph: Graph, cell: Cell) -> None:
+    print(f"Cell {cell} voisin: {graph.get(cell)}")
 
 def visualisation_maze(
         maze: MazeGrid,
@@ -349,13 +353,17 @@ def visualisation_maze(
         ) -> bool:
 
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
+    
     try:
         output: Output = Output(maze.graph, maze.entry, maze.exit)
         maze_structure: dict[Cell, int] = output.get_maze_structure()
-        print(f"start {maze.graph}")
-        output.shortest_path_generation()
+        
+        graph_helper_neigbour(maze.graph, maze.entry)
+
+        while output.shortest_path_generation(maze.height, maze.width) is False:
+            output.shortest_path_generation()
         visualiser: Visualisation = Visualisation(
-            10, 10,
+            5, 6,
             maze, maze_structure, output.get_shortest_path(),
             forty_two, line_color,
             forty_two_color, shortest_path_color, path_state
