@@ -8,12 +8,12 @@ Vertex = dict[Cell, list[Cell]]
 
 
 class Vertex_creation_error(Exception):
-    def __init__(self, msg: str ="Error vertex contruction set") -> None:
+    def __init__(self, msg: str = "Error vertex contruction set") -> None:
         super().__init__(msg)
 
 
 class Display_creation_error(Exception):
-    def __init__(self, msg: str ="Display creation error") -> None:
+    def __init__(self, msg: str = "Display creation error") -> None:
         super().__init__(msg)
 
 
