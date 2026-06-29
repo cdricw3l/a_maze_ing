@@ -4,7 +4,7 @@ import sys
 
 if __name__ == "__main__":
     arg: list[str] = sys.argv[1:]
-    
+
     if len(arg) != 1:
         print(
             f"{Color_line.RED}"

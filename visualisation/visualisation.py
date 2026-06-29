@@ -358,9 +358,9 @@ def visualisation_maze(
         maze_structure: dict[Cell, int] = output.get_maze_structure()
         
         graph_helper_neigbour(maze.graph, maze.entry)
-
-        while output.shortest_path_generation(maze.height, maze.width) is False:
-            output.shortest_path_generation()
+        output.shortest_path_generation(maze)
+        #while output.shortest_path_generation(maze.height, maze.width) is False:
+        #output.shortest_path_generation()
         visualiser: Visualisation = Visualisation(
             5, 6,
             maze, maze_structure, output.get_shortest_path(),

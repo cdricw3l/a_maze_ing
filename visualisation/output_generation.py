@@ -1,4 +1,4 @@
-from maze_generator.maze import Cell, Graph
+from maze_generator.maze import Cell, Graph, MazeGrid
 from typing import List
 import sys
 
@@ -75,31 +75,33 @@ class Output:
     
     def get_direction(self, current: Cell, neighbour: Cell) -> str:
         """ This fonction  return the cardinal direction between current and neigbour"""
-        if neighbour[0] == current[0] and neighbour[1] == current[1] - 1:
-            return "N"
-        if neighbour[0] == current[0] and neighbour[1] == current[1] + 1:
-            return "S"
-        if neighbour[0] == current[0] + 1 and neighbour[1] == current[1]:
-            return "E"
-        if neighbour[0] == current[0] - 1 and neighbour[1] == current[1]:
-            return "W"
+
+        if current  is not None and neighbour is not None:
+            if neighbour[0] == current[0] and neighbour[1] == current[1] - 1:
+                return "N"
+            if neighbour[0] == current[0] and neighbour[1] == current[1] + 1:
+                return "S"
+            if neighbour[0] == current[0] + 1 and neighbour[1] == current[1]:
+                return "E"
+            if neighbour[0] == current[0] - 1 and neighbour[1] == current[1]:
+                return "W"
         return ""
 
-    def is_valide_move(self, current: Cell, neigbour: Cell, maze_structure: dict[Cell, int]) -> bool:
-        """ This fonction check if the wall between two cell is open """
-        # get the direction fron current to neigbour (WSEN)
-        direction: str = self.get_direction(current, neigbour)
-        # get the (WSEN) stucture of the cell
-        wall: int = maze_structure.get(current)
-        if direction == "W" and ((wall >> 3) & 1) == 0:
-            return True
-        if direction == "S" and ((wall >> 2) & 1) == 0:
-            return True
-        if direction == "E" and ((wall >> 1) & 1) == 0:
-            return True
-        if direction == "N" and ((wall >> 0) & 1) == 0:
-            return True
-        return False
+    # def is_valide_move(self, current: Cell, neigbour: Cell, maze_structure: dict[Cell, int]) -> bool:
+    #     """ This fonction check if the wall between two cell is open """
+    #     # get the direction fron current to neigbour (WSEN)
+    #     direction: str = self.get_direction(current, neigbour)
+    #     # get the (WSEN) stucture of the cell
+    #     wall: int = maze_structure.get(current)
+    #     if direction == "W" and ((wall >> 3) & 1) == 0:
+    #         return True
+    #     if direction == "S" and ((wall >> 2) & 1) == 0:
+    #         return True
+    #     if direction == "E" and ((wall >> 1) & 1) == 0:
+    #         return True
+    #     if direction == "N" and ((wall >> 0) & 1) == 0:
+    #         return True
+    #     return False
 
     def get_maze_structure(self) -> dict[Cell, int]:
 
@@ -124,7 +126,34 @@ class Output:
             output.update({key: value})
         return output
 
-    
+    def bfs_algorithm(self, maze: MazeGrid, current: Cell, exit: Cell) -> dict[Cell, str]:
+        """
+        This algorithm called breadth first search uses a queue to visit all
+        possible paths and when the end is hit, get back via a path tracker
+        """
+
+        visited: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
+        visited.add(current)
+        queue: list[Cell] = [current]
+        parent: dict[Cell, Cell] = {current: None}
+        while queue:
+            current = queue.pop(0)
+            if current == exit:
+                break
+            for neighbor in maze.neighbors(current):
+                if neighbor in visited:
+                    continue
+
+                visited.add(neighbor)
+                parent[neighbor] = current
+                queue.append(neighbor)
+        path: dict[Cell, str] = {}
+        curr: Cell = exit
+        while curr is not None:
+            path.update({curr: self.get_direction(curr, parent.get(curr))})
+            curr = parent.get(curr)
+        #path.reverse()
+        return path
 
     def _shortest_path_algo(self,
                             current: Cell,
@@ -160,20 +189,25 @@ class Output:
                 #print(f"visited: {visited}")
         return True
 
-    def shortest_path_generation(self, map_height: int, map_width: int) -> bool:
-        current = self.__entry
-        visited: list[Cell] = []
-        neighbour: list[Cell] | None = self.__graph.get(current)
+
+    def shortest_path_generation(self, maze: MazeGrid) -> bool:
+        entry = self.__entry
+        exit = self.__exit
+        #visited: list[Cell] = []
+        #neighbour: list[Cell] | None = self.__graph.get(current)
         path: dict[Cell, str] = {}
         
-        if map_height > 40 and map_width > 40:
-            sys.setrecursionlimit(sys.getrecursionlimit() + 500)
-        if neighbour is None:
-            raise Output_creation_error(
-                f"Output file creation error: "
-                f"cant't found neighbour of the cell: {current}")
+        # if map_height > 40 and map_width > 40:
+        #     sys.setrecursionlimit(sys.getrecursionlimit() + 500)
+        # if neighbour is None:
+        #     raise Output_creation_error(
+        #         f"Output file creation error: "
+        #         f"cant't found neighbour of the cell: {current}")
         try:
-            self._shortest_path_algo(current, neighbour, visited, path)
+            shortest_path: dict[Cell, str] = self.bfs_algorithm(maze ,entry, exit)
+            self.set_shortest_path(shortest_path)
+            # for s in shortest_path:
+            #     print(f"cell: {s} direction: {shortest_path.get(s)}" )
         except (RecursionError) as e:
             print(f"{e}")
             # if an Recurtion error occure, setrecursionlimit is increase
@@ -200,6 +234,7 @@ class Output:
                 path: str = "".join([
                     self.get_shortest_path()[k]
                             for k in self.get_shortest_path()])
+                print(path)
                 f.write(f"{path}\n")
         except Exception as e:
             raise Output_creation_error(f"Output file creation error: {e}")

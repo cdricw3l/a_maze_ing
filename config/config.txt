@@ -1,9 +1,9 @@
 WIDTH=40
 HEIGHT=40
 ENTRY=3,2
-EXIT=4,8
+EXIT=39,39
 OUTPUT_FILE=maze.txt
-PERFECT=True
+PERFECT=False
 
 
 #taille max 40 * 40
