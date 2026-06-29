@@ -113,10 +113,6 @@ class Visualisation(Char_set):
         room_bit: int | None = self.__struct.get(adjoining_rooms)
         adjacent_cell_bit: int | None = self.__struct.get(adjacent_cell)
 
-        # print(f"room: {adjoining_rooms,room_bit},"
-        # f"adjacent cell: {adjacent_cell, adjacent_cell_bit}"
-        # f"position: {direction}")
-
         if room_bit is None and adjacent_cell_bit is None:
             return ""
         if room_bit is None or adjacent_cell_bit is None:
@@ -161,13 +157,6 @@ class Visualisation(Char_set):
                         adjoining_rooms[1][1] - 1)
         s_cell: Cell = (adjoining_rooms[1][0] - 1,
                         adjoining_rooms[1][1])
-
-        # print(f"adjoining root: {adjoining_rooms}")
-        # print(f"vertice: {vertice}, "
-        # f"w: {w_cell}, "
-        # f"n: {n_cell}, "
-        # f"e: {e_cell}, "
-        # f"s: {s_cell}")
 
         nord: str = self.check_if_open(adjoining_rooms[0], n_cell, "N")
         v = v + nord
@@ -340,9 +329,6 @@ class Visualisation(Char_set):
         print(line)
 
 
-def graph_helper_neigbour(graph: Graph, cell: Cell) -> None:
-    print(f"Cell {cell} voisin: {graph.get(cell)}")
-
 def visualisation_maze(
         maze: MazeGrid,
         line_color: str,
@@ -356,11 +342,7 @@ def visualisation_maze(
     try:
         output: Output = Output(maze.graph, maze.entry, maze.exit)
         maze_structure: dict[Cell, int] = output.get_maze_structure()
-        
-        graph_helper_neigbour(maze.graph, maze.entry)
         output.shortest_path_generation(maze)
-        #while output.shortest_path_generation(maze.height, maze.width) is False:
-        #output.shortest_path_generation()
         visualiser: Visualisation = Visualisation(
             5, 6,
             maze, maze_structure, output.get_shortest_path(),
