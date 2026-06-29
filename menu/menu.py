@@ -14,7 +14,7 @@ def color_line() -> str:
 6:{Color_line.PURPLE}Purple{Color_line.RESET}\n\
 7:{Color_line.CYAN}Cyan{Color_line.RESET}\n\
 8:{Color_line.WHITE}White{Color_line.RESET}")
-    input_user: str = input("Choice? (1-9): ")
+    input_user: str = input("Choice? (1-9): ").strip()
     match input_user:
         case "1":
             return Color_line.BLACK
@@ -48,7 +48,7 @@ def background_color(field: str) -> str:
 7:{Color_bg.PURPLE}Purple{Color_bg.RESET}\n\
 8:{Color_bg.CYAN}Cyan{Color_bg.RESET}\n\
 9:{Color_bg.WHITE}White{Color_bg.RESET}")
-    input_user: str = input("Choice? (1-9): ")
+    input_user: str = input("Choice? (1-9): ").strip()
     match input_user:
         case "1":
             return Color_bg.TRANSPARANT
@@ -94,7 +94,7 @@ def maze_menu(config_file: str) -> int:
             print("4. Rotate 42 colors")
             print("5. Rotate Path colors")
             print("6. Quit")
-            user_input = input("Choice? (1-5): ")
+            user_input = input("Choice? (1-5): ").strip()
             match user_input:
                 case "1":
                     maze = get_maze(config_file)
