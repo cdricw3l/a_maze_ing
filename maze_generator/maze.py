@@ -6,7 +6,7 @@ import sys
 
 Cell = Tuple[int, int]
 Graph = DefaultDict[Cell, List[Cell]]
-IMPERFECT: float = 1
+IMPERFECTION_RATIO: float = 0.3
 
 
 class MazeValidationError(ValueError):
@@ -185,7 +185,7 @@ def run_algorithm(config: Config) -> MazeGrid:
         stack.append(neighbor)
 
     if config.perfect is False:
-        maze.make_imperfect(IMPERFECT)
+        maze.make_imperfect(IMPERFECTION_RATIO)
     return maze
 
 

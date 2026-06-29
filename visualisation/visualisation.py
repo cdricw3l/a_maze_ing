@@ -1,4 +1,4 @@
-from maze_generator.maze import MazeGrid, Cell, Graph
+from maze_generator.maze import MazeGrid, Cell
 from .color import Color_bg
 from .output_generation import Output_creation_error, Output
 from typing import List, Set
@@ -8,12 +8,12 @@ Vertex = dict[Cell, list[Cell]]
 
 
 class Vertex_creation_error(Exception):
-    def __init__(self, msg = "Error vertices contruction set") -> None:
+    def __init__(self, msg: str ="Error vertex contruction set") -> None:
         super().__init__(msg)
 
 
 class Display_creation_error(Exception):
-    def __init__(self, msg = "Display creation error") -> None:
+    def __init__(self, msg: str ="Display creation error") -> None:
         super().__init__(msg)
 
 
@@ -27,7 +27,7 @@ class Char_set:
             "NSW": '┫', "ESW": '┳', "NE": '┗',
             "NS": '┃', "NW": '┛', "ES": '┏',
             "EW": '━', "SW": '┓', "N": '╹',
-            "E": '╺', "S": '╻', "W": '╸', "":' '}
+            "E": '╺', "S": '╻', "W": '╸', "": ' '}
 
     def get_char(self, code: str) -> str | None:
         return self.__char_set.get(code)
@@ -144,10 +144,11 @@ class Visualisation(Char_set):
         return ""
 
     def get_vertex_char(self,
-                         adjoining_rooms: List[Cell] | None) -> str | None:
+                        adjoining_rooms: List[Cell] | None) -> str | None:
 
         if adjoining_rooms is None:
-            raise Vertex_creation_error(f"adjoining_rooms are none {adjoining_rooms}")
+            raise Vertex_creation_error(
+                f"adjoining_rooms are none {adjoining_rooms}")
         v: str = ""
         w_cell: Cell = (adjoining_rooms[0][0],
                         adjoining_rooms[0][1] + 1)
@@ -168,7 +169,7 @@ class Visualisation(Char_set):
         v = v + west
         char: str | None = self.get_char(v)
         if char is None:
-            raise Vertex_creation_error(f"get_vertex_char: error char creation")
+            raise Vertex_creation_error("get_vertex_char: error char creation")
         return char
 
     def add_char(self, char: str, number: int, color: str) -> str:
@@ -230,11 +231,11 @@ class Visualisation(Char_set):
         vertex_char: Vertex_char = {}
         for vertex in vertex_adjacent:
             # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
-            charactere: str | None = self \
+            character: str | None = self \
                 .get_vertex_char(vertex_adjacent.get(vertex))
-            # if charactere is None:
-            #     raise Vertex_creation_error(f"{vertice}")
-            vertex_char.update({vertex: charactere})
+            if character is None:
+                raise Vertex_creation_error(f"{character}")
+            vertex_char.update({vertex: character})
         return vertex_char
 
     def vertex_line(self, vertex: dict[Cell, str]) -> str:
@@ -322,7 +323,6 @@ class Visualisation(Char_set):
                 new_v: dict[Cell, str] = \
                     {k: vertices_char[k] for k in vertices_char if k[1] == i}
                 line = line + self.vertex_line(new_v)
-                #for j in range():
                 line = line + self.inter_vertex_line(new_v)
         except Vertex_creation_error as e:
             raise Display_creation_error(f"Vertex creation error: {e}")
@@ -338,11 +338,10 @@ def visualisation_maze(
         ) -> bool:
 
     forty_two: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
-    
     try:
         output: Output = Output(maze.graph, maze.entry, maze.exit)
         maze_structure: dict[Cell, int] = output.get_maze_structure()
-        output.shortest_path_generation(maze)
+        output.bfs_algorithm(maze, maze.entry, maze.exit)
         visualiser: Visualisation = Visualisation(
             5, 6,
             maze, maze_structure, output.get_shortest_path(),

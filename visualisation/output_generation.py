@@ -1,6 +1,6 @@
 from maze_generator.maze import Cell, Graph, MazeGrid
 from typing import List
-import sys
+
 
 class Output_creation_error(Exception):
     def __init__(self, msg: str) -> None:
@@ -24,19 +24,13 @@ class Output:
         self.__exit = exit
         self.__maze_structure = self.get_maze_structure()
         self.__shortest_path = {}
-        sys.setrecursionlimit(1500)
 
     def set_shortest_path(self, path: dict[Cell, str]) -> None:
         self.__shortest_path = {k: path[k] for k in path}
 
     def get_shortest_path(self) -> dict[Cell, str]:
         return self.__shortest_path
-    
-    @staticmethod
-    def get_len_path(path: dict[Cell, str]) -> int:
-        i: int = len({i for i in path})
-        return i
-    
+
     def _bytes_direction_activation(self,
                                     cell: tuple[float, float],
                                     open_neighbors: List[Cell]
@@ -72,36 +66,26 @@ class Output:
             value = value | (1 << 0)
 
         return value
-    
-    def get_direction(self, current: Cell, neighbour: Cell) -> str:
-        """ This fonction  return the cardinal direction between current and neigbour"""
 
-        if current  is not None and neighbour is not None:
+    def get_direction(self, current: Cell, neighbour: Cell | None) -> str:
+        """
+            This fonction  return the cardinal direction
+            between current and neigbour
+            For matching reason with the bfs alorithme,
+            the return value is reversed
+            Nord becomme south, East become west
+        """
+
+        if current is not None and neighbour is not None:
             if neighbour[0] == current[0] and neighbour[1] == current[1] - 1:
-                return "N"
-            if neighbour[0] == current[0] and neighbour[1] == current[1] + 1:
                 return "S"
+            if neighbour[0] == current[0] and neighbour[1] == current[1] + 1:
+                return "N"
             if neighbour[0] == current[0] + 1 and neighbour[1] == current[1]:
-                return "E"
-            if neighbour[0] == current[0] - 1 and neighbour[1] == current[1]:
                 return "W"
+            if neighbour[0] == current[0] - 1 and neighbour[1] == current[1]:
+                return "E"
         return ""
-
-    # def is_valide_move(self, current: Cell, neigbour: Cell, maze_structure: dict[Cell, int]) -> bool:
-    #     """ This fonction check if the wall between two cell is open """
-    #     # get the direction fron current to neigbour (WSEN)
-    #     direction: str = self.get_direction(current, neigbour)
-    #     # get the (WSEN) stucture of the cell
-    #     wall: int = maze_structure.get(current)
-    #     if direction == "W" and ((wall >> 3) & 1) == 0:
-    #         return True
-    #     if direction == "S" and ((wall >> 2) & 1) == 0:
-    #         return True
-    #     if direction == "E" and ((wall >> 1) & 1) == 0:
-    #         return True
-    #     if direction == "N" and ((wall >> 0) & 1) == 0:
-    #         return True
-    #     return False
 
     def get_maze_structure(self) -> dict[Cell, int]:
 
@@ -126,7 +110,11 @@ class Output:
             output.update({key: value})
         return output
 
-    def bfs_algorithm(self, maze: MazeGrid, current: Cell, exit: Cell) -> dict[Cell, str]:
+    def bfs_algorithm(
+            self,
+            maze: MazeGrid,
+            current: Cell,
+            exit: Cell) -> None:
         """
         This algorithm called breadth first search uses a queue to visit all
         possible paths and when the end is hit, get back via a path tracker
@@ -135,7 +123,7 @@ class Output:
         visited: set[Cell] = maze.forty_two_logo(maze.width, maze.height)
         visited.add(current)
         queue: list[Cell] = [current]
-        parent: dict[Cell, Cell] = {current: None}
+        parent: dict[Cell, Cell | None] = {current: None}
         while queue:
             current = queue.pop(0)
             if current == exit:
@@ -148,73 +136,11 @@ class Output:
                 parent[neighbor] = current
                 queue.append(neighbor)
         path: dict[Cell, str] = {}
-        curr: Cell = exit
+        curr: Cell | None = exit
         while curr is not None:
             path.update({curr: self.get_direction(curr, parent.get(curr))})
             curr = parent.get(curr)
-        #path.reverse()
-        return path
-
-    def _shortest_path_algo(self,
-                            current: Cell,
-                            neighbour: list[Cell] | None,
-                            visited: list[Cell],
-                            path: dict[Cell, str]) -> bool:
-        
-        if neighbour is not None and len(neighbour) == 0:
-            return False
-    
-        if current == self.__exit:
-            if self.get_len_path(self.__shortest_path) == 0 or self.get_len_path(path) < self.get_len_path(self.__shortest_path):
-                print(f"path update new: {self.get_len_path(path)} old: {self.get_len_path(self.__shortest_path)}")
-                self.set_shortest_path(path)
-            return False
-        visited.append(current)
-        for cell in neighbour:
-            if cell not in visited:
-
-                direction = self.get_direction(current, cell)
-                # print(f"string {string}")
-                path.update({cell: direction})
-                new_neighbour: list[Cell] | None = self.__graph.get(cell)
-                if new_neighbour is None:
-                    return False
-                self._shortest_path_algo(cell,
-                                            new_neighbour,
-                                            visited,
-                                            path)
-                # print(f"delete char {string}")
-                path.popitem()
-                #visited.pop()
-                #print(f"visited: {visited}")
-        return True
-
-
-    def shortest_path_generation(self, maze: MazeGrid) -> bool:
-        entry = self.__entry
-        exit = self.__exit
-        #visited: list[Cell] = []
-        #neighbour: list[Cell] | None = self.__graph.get(current)
-        path: dict[Cell, str] = {}
-        
-        # if map_height > 40 and map_width > 40:
-        #     sys.setrecursionlimit(sys.getrecursionlimit() + 500)
-        # if neighbour is None:
-        #     raise Output_creation_error(
-        #         f"Output file creation error: "
-        #         f"cant't found neighbour of the cell: {current}")
-        try:
-            shortest_path: dict[Cell, str] = self.bfs_algorithm(maze ,entry, exit)
-            self.set_shortest_path(shortest_path)
-            # for s in shortest_path:
-            #     print(f"cell: {s} direction: {shortest_path.get(s)}" )
-        except (RecursionError) as e:
-            print(f"{e}")
-            # if an Recurtion error occure, setrecursionlimit is increase
-            # and the fonction return false. The fonction is recall until she return true.
-            sys.setrecursionlimit(sys.getrecursionlimit() + 500)
-            return False
-        return True
+        self.set_shortest_path(path)
 
     def write_output_file(self, maze_height: int) -> None:
         # structure is a dict where:
@@ -234,10 +160,7 @@ class Output:
                 path: str = "".join([
                     self.get_shortest_path()[k]
                             for k in self.get_shortest_path()])
-                print(path)
-                f.write(f"{path}\n")
+                # reverse the string with [::-1]
+                f.write(f"{path[::-1]}\n")
         except Exception as e:
             raise Output_creation_error(f"Output file creation error: {e}")
-
-if __name__ == "main":
-    print(0 >> 0 & 1)
