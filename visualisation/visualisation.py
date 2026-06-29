@@ -2,7 +2,6 @@ from maze_generator.maze import MazeGrid, Cell, Graph
 from .color import Color_bg
 from .output_generation import Output_creation_error, Output
 from typing import List, Set
-import sys
 
 Vertex_char = dict[Cell, str]
 Vertex = dict[Cell, list[Cell]]
