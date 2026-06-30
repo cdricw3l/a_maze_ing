@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mazegen"
+version = "1.0.0"
+description = "Reusable maze generator module for the 42 a-maze-ing project"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "lecavall" },
+  { name = "cebouhad" }
+]
+license = { text = "MIT" }
+dependencies = []

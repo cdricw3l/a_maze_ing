@@ -8,7 +8,6 @@ class Color_bg():
     PURPLE: str = "\033[45m"
     CYAN: str = "\033[46m"
     WHITE: str = "\033[47m"
-    DEFAULT: str = "\033[47m"
     RESET: str = "\033[0m"
 
 
@@ -21,5 +20,4 @@ class Color_line():
     PURPLE: str = "\033[95m"
     CYAN: str = "\033[96m"
     WHITE: str = "\033[97m"
-    DEFAULT: str = "\033[97m"
     RESET: str = "\033[0m"

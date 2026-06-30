@@ -1,5 +1,5 @@
 from visualisation.color import Color_bg, Color_line
-from maze_generator.maze import MazeGrid, get_maze
+from mazegen.mazegen import MazeGrid, get_maze
 from visualisation.visualisation import visualisation_maze
 import time
 
@@ -14,7 +14,7 @@ def color_line() -> str:
 6:{Color_line.PURPLE}Purple{Color_line.RESET}\n\
 7:{Color_line.CYAN}Cyan{Color_line.RESET}\n\
 8:{Color_line.WHITE}White{Color_line.RESET}")
-    input_user: str = input("Choice? (1-9): ")
+    input_user: str = input("Choice? (1-9): ").strip()
     match input_user:
         case "1":
             return Color_line.BLACK
@@ -48,7 +48,7 @@ def background_color(field: str) -> str:
 7:{Color_bg.PURPLE}Purple{Color_bg.RESET}\n\
 8:{Color_bg.CYAN}Cyan{Color_bg.RESET}\n\
 9:{Color_bg.WHITE}White{Color_bg.RESET}")
-    input_user: str = input("Choice? (1-9): ")
+    input_user: str = input("Choice? (1-9): ").strip()
     match input_user:
         case "1":
             return Color_bg.TRANSPARANT
@@ -75,9 +75,9 @@ def background_color(field: str) -> str:
 
 def maze_menu(config_file: str) -> int:
     maze: MazeGrid = get_maze(config_file)
-    color_l: str = Color_line.DEFAULT
-    color_bg: str = Color_bg.DEFAULT
-    color_path: str = Color_bg.YELLOW
+    color_l: str = Color_line.CYAN
+    color_bg: str = Color_bg.GREEN
+    color_path: str = Color_bg.PURPLE
     path_state: bool = False
     state: bool = visualisation_maze(
         maze,
@@ -94,7 +94,7 @@ def maze_menu(config_file: str) -> int:
             print("4. Rotate 42 colors")
             print("5. Rotate Path colors")
             print("6. Quit")
-            user_input = input("Choice? (1-5): ")
+            user_input = input("Choice? (1-5): ").strip()
             match user_input:
                 case "1":
                     maze = get_maze(config_file)
@@ -110,8 +110,8 @@ def maze_menu(config_file: str) -> int:
                     else:
                         path_state = False
                     state = visualisation_maze(maze,
-                                               Color_line.DEFAULT,
-                                               Color_bg.DEFAULT,
+                                               color_l,
+                                               color_bg,
                                                color_path, path_state)
                 case "3":
                     color_l = color_line()

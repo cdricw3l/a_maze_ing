@@ -6,7 +6,7 @@ We have to check if th entry is valide and the exit also
 
 
 
-0000 = NESW
+0000 = WSEN
 
 0001 = 1 
 0010 = 2
