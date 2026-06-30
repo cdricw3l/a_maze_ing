@@ -108,15 +108,13 @@ class Visualisation(Char_set):
 
     def check_if_open(self,
                       adjoining_rooms: Cell,
-                      adjacent_cell: Cell,
                       direction: str) -> str:
         room_bit: int | None = self.__struct.get(adjoining_rooms)
-        adjacent_cell_bit: int | None = self.__struct.get(adjacent_cell)
 
-        if room_bit is None and adjacent_cell_bit is None:
-            return ""
-        if room_bit is None or adjacent_cell_bit is None:
-            return direction
+        # if room_bit is None and adjacent_cell_bit is None:
+        #     return ""
+        # if room_bit is None or adjacent_cell_bit is None:
+        #     return direction
         if direction == "W":
             # comparaison nord room_bit -> south ajacent cell give w
             if ((room_bit >> Direction.SOUTH) & 1) == 1\
@@ -149,22 +147,13 @@ class Visualisation(Char_set):
         if adjoining_rooms is None:
             raise Vertex_creation_error(f"adjoining_rooms is none {adjoining_rooms}")
         v: str = ""
-        w_cell: Cell = (adjoining_rooms[0][0],
-                        adjoining_rooms[0][1] + 1)
-        n_cell: Cell = (adjoining_rooms[0][0] + 1,
-                        adjoining_rooms[0][1])
-        e_cell: Cell = (adjoining_rooms[1][0],
-                        adjoining_rooms[1][1] - 1)
-        s_cell: Cell = (adjoining_rooms[1][0] - 1,
-                        adjoining_rooms[1][1])
-
-        nord: str = self.check_if_open(adjoining_rooms[0], n_cell, "N")
+        nord: str = self.check_if_open(adjoining_rooms[0], "N")
         v = v + nord
-        east: str = self.check_if_open(adjoining_rooms[1], e_cell, "E")
+        east: str = self.check_if_open(adjoining_rooms[1], "E")
         v = v + east
-        south: str = self.check_if_open(adjoining_rooms[1], s_cell, "S")
+        south: str = self.check_if_open(adjoining_rooms[1], "S")
         v = v + south
-        west: str = self.check_if_open(adjoining_rooms[0], w_cell, "W")
+        west: str = self.check_if_open(adjoining_rooms[0], "W")
         v = v + west
         char: str | None = self.get_char(v)
         if char is None:
