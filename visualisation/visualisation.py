@@ -147,7 +147,7 @@ class Visualisation(Char_set):
                          adjoining_rooms: List[Cell] | None) -> str | None:
 
         if adjoining_rooms is None:
-            raise Vertex_creation_error(f"adjoining_rooms are none {adjoining_rooms}")
+            raise Vertex_creation_error(f"adjoining_rooms is none {adjoining_rooms}")
         v: str = ""
         w_cell: Cell = (adjoining_rooms[0][0],
                         adjoining_rooms[0][1] + 1)
@@ -229,7 +229,7 @@ class Visualisation(Char_set):
         """
         vertex_char: Vertex_char = {}
         for vertex in vertex_adjacent:
-            # print(f"{vertice}, ajoining :{vertices.get(vertice)}")
+            print(f"{vertex}, ajoining :{vertex_adjacent.get(vertex)}")
             charactere: str | None = self \
                 .get_vertex_char(vertex_adjacent.get(vertex))
             # if charactere is None:
